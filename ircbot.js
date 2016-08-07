@@ -6,28 +6,13 @@ var http = require('http');
 
 var control = require('./control');
 
-var server = 'irc.ludost.net';
-var nickname = 'initLabNotifier';
-//var nicknamePassword = fs.readFileSync('nickserv.txt');
+var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-var announceChannel = '#initlab';
-var socketPath = '/tmp/ircbot.sock';
-
-var config = {
-    autoConnect: false,
-    channels: [
-        announceChannel
-    ],
-    debug: true,
-    //password: nickname + ' ' + nicknamePassword,
-    port: 6697,
-    realName: 'init Lab IRC bot',
-    secure: true,
-    showErrors: true,
-    userName: 'ircbot'
-};
-
-var ircbot = new irc.Client(server, nickname, config);
+var ircbot = new irc.Client(
+	config.irc.server,
+	config.irc.nickname,
+	config.irc.options
+);
 
 // error handler
 ircbot.addListener('error', function(message) {
@@ -68,13 +53,13 @@ function ircConnect() {
 
 // misc
 ircbot.addListener('action', function(from, to, message) {
-    if (to.indexOf('#') === 0 && message === 'kicks ' + nickname) {
+    if (to.indexOf('#') === 0 && message === 'kicks ' + config.irc.nickname) {
         ircbot.say(to, 'ouch!');
     }
 });
 
 // control socket
-var controlSocket = new control.Socket(socketPath, ircConnect, function(cmd) {
+var controlSocket = new control.Socket(config.socket.path, ircConnect, function(cmd) {
     var args = cmd.split(' ');
     var cmd = args.shift().toLowerCase();
     
@@ -143,7 +128,7 @@ var controlSocket = new control.Socket(socketPath, ircConnect, function(cmd) {
             
             switch (cmd) {
                 case 'test':
-                    ircbot.say(announceChannel, 'test');
+                    ircbot.say(config.irc.announceChannel, 'test');
                 break;
                 case 'exit':
                     if (ircbot.conn) {

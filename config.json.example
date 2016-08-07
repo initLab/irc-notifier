@@ -1,0 +1,22 @@
+{
+	"socket": {
+		"path": "/tmp/ircbot.sock"
+	},
+	"irc": {
+		"server": "irc.example.com",
+		"nickname": "notifier",
+		"options": {
+			"autoConnect": false,
+			"channels": [
+				"#example"
+			],
+			"debug": true,
+			"port": 6697,
+			"realName": "IRC bot",
+			"secure": true,
+			"showErrors": true,
+			"userName": "ircbot"
+		},
+		"announceChannel": "#example"
+	}
+}
