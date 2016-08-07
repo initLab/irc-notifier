@@ -8,11 +8,10 @@ var control = require('./control');
 
 var server = 'irc.ludost.net';
 var nickname = 'initLabNotifier';
-var nicknamePassword = fs.readFileSync('nickserv.txt');
+//var nicknamePassword = fs.readFileSync('nickserv.txt');
 
 var announceChannel = '#initlab';
 var socketPath = '/tmp/ircbot.sock';
-var pingTimer = null;
 
 var config = {
     autoConnect: false,
@@ -66,19 +65,6 @@ ircbot.addListener('channellist_item', function(info) {
 function ircConnect() {
 	ircbot.connect(Math.pow(2, 32) - 1);
 }
-
-// ping
-ircbot.addListener('ping', function() {
-	if (pingTimer !== null) {
-		clearTimeout(pingTimer);
-	}
-
-	pingTimer = setTimeout(function() {
-		pingTimer = null;
-		ircbot.disconnect();
-		setTimeout(ircConnect, 10 * 1000);
-	}, 30 * 60 * 1000);
-});
 
 // misc
 ircbot.addListener('action', function(from, to, message) {
