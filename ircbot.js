@@ -59,7 +59,6 @@ ircbot.addListener('action', function(from, to, message) {
     }
 });
 
-// weather
 ircbot.addListener('message', function (from, to, message) {
     if (to !== config.irc.announceChannel) {
         return;
@@ -90,7 +89,7 @@ ircbot.addListener('message', function (from, to, message) {
                     return;
                 }
                 var users = body.map(function(user) {
-                    return user.name;
+                    return user.username + ' (' + user.name + ')';
                 }).join(', ');
                 ircbot.say(to, 'People in init Lab: ' + users);
             });
