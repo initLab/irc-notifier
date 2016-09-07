@@ -94,6 +94,14 @@ ircbot.addListener('message', function (from, to, message) {
                 ircbot.say(to, 'People in init Lab: ' + users);
             });
             break;
+        case '!door':
+            request({
+                url: 'https://fauna.initlab.org/api/door/status.json',
+                json: true
+            }, function(error, response, body) {
+                ircbot.say(to, 'The door is ' + body.latch + ' and ' + body.door);
+            });
+            break;
     }
 });
 
