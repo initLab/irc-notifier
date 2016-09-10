@@ -3,6 +3,17 @@ var fs = require('fs');
 
 function Socket(path, successCallback, cmdCallback) {
     var server = net.createServer();
+	var invokedSuccess = false;
+	
+	function invokeSuccess() {
+		if (invokedSuccess) {
+			return;
+		}
+		
+		invokedSuccess = true;
+		
+		successCallback();
+	}
     
     server.on('connection', function(connection) {
         console.info('CONTROL: Socket open');
@@ -33,7 +44,7 @@ function Socket(path, successCallback, cmdCallback) {
     server.on('listening', function() {
         console.info('CONTROL: Socket bound');
 
-        fs.chmod(path, 0775, successCallback);
+        fs.chmod(path, 0775, invokeSuccess);
     });
 
     server.on('error', function (e) {
@@ -42,10 +53,16 @@ function Socket(path, successCallback, cmdCallback) {
                 console.warn('CONTROL: Socket in use, retrying...');
                 fs.unlink(path, bindSocket);
             break;
+            case 'EACCES':
+				console.warn('CONTROL: Access denied');
+			break;
             default:
                 throw e;
             break;
         }
+		
+		console.warn('Starting without control socket...');
+		invokeSuccess();
     });
 
     function bindSocket() {
