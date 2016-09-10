@@ -89,7 +89,7 @@ ircbot.addListener('message', function (from, to, message) {
                     return;
                 }
                 var users = body.map(function(user) {
-                    return user.username + ' (' + user.name + ')';
+                    return user.name + ' (' + user.username + ')';
                 }).join(', ');
                 ircbot.say(to, 'People in init Lab: ' + users);
             });
