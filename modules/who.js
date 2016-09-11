@@ -1,4 +1,6 @@
 module.exports = function(ircbot, config) {
+	var request = require('request');
+	
 	ircbot.addListener('message', function (from, to, message) {
 		if (to !== config.irc.announceChannel || message !== '!who') {
 			return;

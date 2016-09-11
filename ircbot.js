@@ -2,8 +2,6 @@
 
 var irc = require('irc');
 var fs = require('fs');
-var http = require('http');
-var request = require('request');
 var requireDir = require('require-dir');
 
 var control = require('./control');
