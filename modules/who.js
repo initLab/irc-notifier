@@ -15,9 +15,16 @@ module.exports = function(ircbot, config) {
 				return;
 			}
 			
-			ircbot.say(to, 'People in init Lab: ' + body.map(function(user) {
+			var people = body.map(function(user) {
 				return user.name + ' (' + user.username + ')';
-			}).join(', '));
+			});
+			
+			if (people.length === 0) {
+				ircbot.say(to, 'No one in init Lab :(');
+				return;
+			}
+			
+			ircbot.say(to, 'People in init Lab: ' + people.join(', '));
 		});
 	});
 };
