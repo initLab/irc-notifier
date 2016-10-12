@@ -15,10 +15,14 @@ module.exports = function(ircbot, config) {
 				return;
 			}
 			
-            var mystery_users = 0;
-			var people = body.map(function(user) {
-                if (user.username != 'mystery_user') { return user.name + ' (' + user.username + ')'; }
-                else { mystery_users++; }
+			var mystery_users = body.filter(function(user) {
+				return user.id === null;
+			}).length;
+			
+			var people = body.filter(function(user) {
+				return user.id !== null;
+			}).map(function(user) {
+				return user.name + ' (' + user.username + ')';
 			});
 			
 			if (people.length === 0) {
@@ -26,11 +30,20 @@ module.exports = function(ircbot, config) {
 				return;
 			}
 
-            var mystery_str = '';
-            if (mystery_users > 1) {  mystery_str = mystery_users + ' Mystery labbers'; }
-            else { mystery_str = 'Mystery labber'}
+			var mystery_str = '';
 			
-			ircbot.say(to, 'People in init Lab: ' + people.join(', ') + ', ' + mystery_str);
+			if (mystery_users > 0) {
+				if (mystery_users === 1) {
+					mystery_str = 'Mystery labber';
+				}
+				else {
+					mystery_str = mystery_users + ' Mystery labbers';
+				}
+				
+				people.push(mystery_str);
+			}
+			
+			ircbot.say(to, 'People in init Lab: ' + people.join(', '));
 		});
 	});
 };
