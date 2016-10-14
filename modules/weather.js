@@ -11,7 +11,7 @@ module.exports = function(ircbot, config) {
 			json: true
 		}, function(error, response, body) {
 			if (error !== null || response.statusCode !== 200) {
-				ircbot.say(to, 'Error getting data');
+				ircbot.say(to, 'Error getting data, status code=' + response.statusCode);
 				return;
 			}
 			

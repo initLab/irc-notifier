@@ -10,6 +10,11 @@ module.exports = function(ircbot, config) {
 			url: 'https://fauna.initlab.org/api/door/status.json',
 			json: true
 		}, function(error, response, body) {
+			if (error !== null || response.statusCode !== 200) {
+				ircbot.say(to, 'Error getting data, status code=' + response.statusCode);
+				return;
+			}
+			
 			ircbot.say(to, 'The door is ' + body.latch + ' and ' + body.door);
 		});
 	});
