@@ -1,11 +1,9 @@
-module.exports = function(ircbot) {
-	ircbot.addListener('raw', function(message) {
-		switch (message.rawCommand) {
-			case '704':
-			case '705':
-			case '706':
-				console.log(message.args[2]);
-			break;
+module.exports = function(ircbot, config) {
+	ircbot.addListener('message', function (from, to, message) {
+		if (to !== config.irc.announceChannel || message !== '!help') {
+			return;
 		}
+		
+		ircbot.say(to, 'Available commands: !door - shows door status, !who - shows present users, !lights - shows lights status, !weather - shows the weather station readings');
 	});
 };
