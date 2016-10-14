@@ -1,10 +1,8 @@
-module.exports = function(ircbot, config) {
-	var request = require('request');
-	
-	ircbot.addListener('message', function (from, to, message) {
-		if (to !== config.irc.announceChannel || message !== '!weather') {
-			return;
-		}
+module.exports = {
+	key: 'weather',
+	description: 'shows weather station readings',
+	execute: function(ircbot, config, from, to) {
+		var request = require('request');
 		
 		request({
 			url: 'https://cassie.initlab.org/weather.json',
@@ -25,5 +23,5 @@ module.exports = function(ircbot, config) {
 			ircbot.say(to, 'Humidity: ' + body.hum_in.toFixed(0) + ' % in / ' + body.hum_out.toFixed(0) + ' % out');
 			ircbot.say(to, 'Pressure: ' + body.abs_pressure.toFixed(1) + ' hPa');
 		});
-	});
+	}
 };

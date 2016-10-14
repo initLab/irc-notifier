@@ -1,10 +1,8 @@
-module.exports = function(ircbot, config) {
-	var request = require('request');
-	
-	ircbot.addListener('message', function (from, to, message) {
-		if (to !== config.irc.announceChannel || message !== '!who') {
-			return;
-		}
+module.exports = {
+	key: 'who',
+	description: 'shows present users',
+	execute: function(ircbot, config, from, to) {
+		var request = require('request');
 		
 		request({
 			url: 'https://fauna.initlab.org/api/users/present.json',
@@ -50,5 +48,5 @@ module.exports = function(ircbot, config) {
 			
 			ircbot.say(to, 'People in init Lab: ' + people.join(', '));
 		});
-	});
+	}
 };

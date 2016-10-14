@@ -1,10 +1,8 @@
-module.exports = function(ircbot, config) {
-	var request = require('request');
-	
-	ircbot.addListener('message', function (from, to, message) {
-		if (to !== config.irc.announceChannel || message !== '!lights') {
-			return;
-		}
+module.exports = {
+	key: 'lights',
+	description: 'shows lights status',
+	execute: function(ircbot, config, from, to) {
+		var request = require('request');
 		
 		request({
 			url: 'https://fauna.initlab.org/api/lights/status.json',
@@ -22,5 +20,5 @@ module.exports = function(ircbot, config) {
 			
 			ircbot.say(to, 'Lights are ' + body.status + ', policy is ' + body.policy);
 		});
-	});
+	}
 };

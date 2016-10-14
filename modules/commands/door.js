@@ -1,10 +1,8 @@
-module.exports = function(ircbot, config) {
-	var request = require('request');
-	
-	ircbot.addListener('message', function (from, to, message) {
-		if (to !== config.irc.announceChannel || message !== '!door') {
-			return;
-		}
+module.exports = {
+	key: 'door',
+	description: 'shows door status',
+	execute: function(ircbot, config, from, to) {
+		var request = require('request');
 		
 		request({
 			url: 'https://fauna.initlab.org/api/door/status.json',
@@ -22,5 +20,5 @@ module.exports = function(ircbot, config) {
 			
 			ircbot.say(to, 'The door is ' + body.latch + ' and ' + body.door);
 		});
-	});
+	}
 };
