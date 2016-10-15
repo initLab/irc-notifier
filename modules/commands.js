@@ -11,11 +11,11 @@ module.exports = function(ircbot, config) {
 			var command = commands[key];
 			var commandPrefix = '!' + command.key;
 			
-			if (message.indexOf(commandPrefix) !== 0) {
+			if (message !== commandPrefix && message.indexOf(commandPrefix + ' ') !== 0) {
 				return;
 			}
 			
-			command.execute(ircbot, config, from, to, message.substr(commandPrefix.length), commands);
+			command.execute(ircbot, config, from, to, message.substr(commandPrefix.length + 1), commands);
 		});
 	});
 };
