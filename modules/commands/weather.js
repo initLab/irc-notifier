@@ -5,7 +5,7 @@ module.exports = {
 		var request = require('request');
 		
 		request({
-			url: 'https://cassie.initlab.org/weather.json',
+			url: 'https://spitfire.initlab.org/weather.json',
 			json: true
 		}, function(error, response, body) {
 			console.log(error, response, body);
