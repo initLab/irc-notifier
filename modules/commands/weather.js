@@ -8,9 +8,8 @@ module.exports = {
 			url: 'https://spitfire.initlab.org/weather.json',
 			json: true
 		}, function(error, response, body) {
-			console.log(error, response, body);
 			if (error !== null) {
-				ircbot.say(to, 'Request error: ' + error.reason);
+				ircbot.say(to, error.reason ? ('Request error: ' + error.reason) : error.toString());
 				return;
 			}
 			
