@@ -23,6 +23,11 @@ module.exports = {
 				return;
 			}
 			
+			if (body.length === 0) {
+				ircbot.say(to, 'No one in init Lab :(');
+				return;
+			}
+
 			var mystery_users = body.filter(function(user) {
 				return user.id === null;
 			}).length;
@@ -33,11 +38,6 @@ module.exports = {
 				return user.name + ' (' + user.username + ')';
 			});
 			
-			if (people.length === 0) {
-				ircbot.say(to, 'No one in init Lab :(');
-				return;
-			}
-
 			var mystery_str = '';
 			
 			if (mystery_users > 0) {
