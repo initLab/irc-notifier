@@ -9,9 +9,10 @@ module.exports = function(ircbot, config) {
 		
 		Object.keys(commands).forEach(function(key) {
 			var command = commands[key];
-			var commandPrefix = '!' + command.key;
+			var commandPrefix = '!' + command.key.toLowerCase();
+			var lowercaseMessage = message.toLowerCase();
 			
-			if (message !== commandPrefix && message.indexOf(commandPrefix + ' ') !== 0) {
+			if (lowercaseMessage !== commandPrefix && lowercaseMessage.indexOf(commandPrefix + ' ') !== 0) {
 				return;
 			}
 			

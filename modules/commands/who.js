@@ -2,8 +2,13 @@ module.exports = {
 	key: 'who',
 	description: 'shows present users',
 	execute: function(ircbot, config, from, to, message) {
-		if (message === 'let the dogs out') {
+		if (message.toLowerCase() === 'let the dogs out') {
 			ircbot.say(to, 'Who? Who? Who? Who? https://youtu.be/Qkuu0Lwb5EM');
+			return;
+		}
+		
+		if (message.toLowerCase() === 'the fuck is alice') {
+			ircbot.say(to, 'https://youtu.be/bUy83PKjkOI');
 			return;
 		}
 		
