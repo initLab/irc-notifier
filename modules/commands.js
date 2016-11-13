@@ -1,6 +1,8 @@
+'use strict';
+
 module.exports = function(ircbot, config) {
-	var requireDir = require('require-dir');
-	var commands = requireDir('commands');
+	const requireDir = require('require-dir');
+	const commands = requireDir('commands');
 	
 	ircbot.addListener('message', function (from, to, message) {
 		if (to !== config.irc.announceChannel) {
@@ -8,9 +10,9 @@ module.exports = function(ircbot, config) {
 		}
 		
 		Object.keys(commands).forEach(function(key) {
-			var command = commands[key];
-			var commandPrefix = '!' + command.key.toLowerCase();
-			var lowercaseMessage = message.toLowerCase();
+			const command = commands[key];
+			const commandPrefix = '!' + command.key.toLowerCase();
+			const lowercaseMessage = message.toLowerCase();
 			
 			if (lowercaseMessage !== commandPrefix && lowercaseMessage.indexOf(commandPrefix + ' ') !== 0) {
 				return;

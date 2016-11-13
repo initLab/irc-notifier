@@ -1,8 +1,10 @@
+'use strict';
+
 module.exports = {
 	key: 'music',
 	description: 'shows current music track',
 	execute: function(ircbot, config, from, to) {
-		var request = require('request');
+		const request = require('request');
 		
 		request({
 			url: 'http://spitfire.initlab.org:8989/status',
@@ -23,7 +25,7 @@ module.exports = {
 				return;
 			}
 			
-			var states = {
+			const states = {
 				play: 'playing',
 				pause: 'paused',
 				stop: 'stopped',

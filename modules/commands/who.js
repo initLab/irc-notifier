@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
 	key: 'who',
 	description: 'shows present users',
@@ -12,7 +14,7 @@ module.exports = {
 			return;
 		}
 		
-		var request = require('request');
+		const request = require('request');
 		
 		request({
 			url: 'https://fauna.initlab.org/api/users/present.json',
@@ -33,19 +35,19 @@ module.exports = {
 				return;
 			}
 
-			var mystery_users = body.filter(function(user) {
+			const mystery_users = body.filter(function(user) {
 				return user.id === null;
 			}).length;
 			
-			var people = body.filter(function(user) {
+			const people = body.filter(function(user) {
 				return user.id !== null;
 			}).map(function(user) {
 				return user.name + ' (' + user.username + ')';
 			});
 			
-			var mystery_str = '';
-			
 			if (mystery_users > 0) {
+				let mystery_str;
+				
 				if (mystery_users === 1) {
 					mystery_str = 'Mystery labber';
 				}

@@ -1,8 +1,10 @@
+'use strict';
+
 module.exports = {
 	key: 'lights',
 	description: 'shows lights status',
 	execute: function(ircbot, config, from, to) {
-		var request = require('request');
+		const request = require('request');
 		
 		request({
 			url: 'https://fauna.initlab.org/api/lights/status.json',

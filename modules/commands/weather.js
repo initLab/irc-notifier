@@ -1,8 +1,10 @@
+'use strict';
+
 module.exports = {
 	key: 'weather',
 	description: 'shows weather station readings',
 	execute: function(ircbot, config, from, to) {
-		var request = require('request');
+		const request = require('request');
 		
 		request({
 			url: 'https://spitfire.initlab.org/weather.json',

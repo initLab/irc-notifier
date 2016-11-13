@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(ircbot) {
 	ircbot.addListener('channellist_start', function() {
 		console.info('Listing channels...');

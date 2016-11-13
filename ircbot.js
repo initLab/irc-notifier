@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 
-var irc = require('irc');
-var fs = require('fs');
-var requireDir = require('require-dir');
+'use strict';
 
-var control = require('./control');
+const irc = require('irc');
+const fs = require('fs');
+const requireDir = require('require-dir');
 
-var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+const control = require('./control');
 
-var ircbot = new irc.Client(
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
+const ircbot = new irc.Client(
 	config.irc.server,
 	config.irc.nickname,
 	config.irc.options
 );
 
-var modules = requireDir('modules');
+const modules = requireDir('modules');
 
 Object.keys(modules).forEach(function(key) {
 	modules[key](ircbot, config);
@@ -25,13 +27,13 @@ function ircConnect() {
 }
 
 // control socket
-var controlSocket = new control.Socket(config.socket.path, ircConnect, function(cmd) {
-    var args = cmd.split(' ');
-    var cmd = args.shift().toLowerCase();
+const controlSocket = new control.Socket(config.socket.path, ircConnect, function(line) {
+    let args = line.split(' ');
+    let cmd = args.shift().toLowerCase();
     
-    var argsOptional = false;
-    var knownCmd = true;
-    var sendCmd = true;
+    let argsOptional = false;
+    let knownCmd = true;
+    let sendCmd = true;
     
     switch (cmd) {
         case 'quote':
@@ -78,7 +80,7 @@ var controlSocket = new control.Socket(config.socket.path, ircConnect, function(
             }
             
             argsOptional = true;
-            var message = args.join(' ');
+            let message = args.join(' ');
             
             if (message.length) {
                 args = [

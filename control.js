@@ -1,9 +1,11 @@
-var net = require('net');
-var fs = require('fs');
+'use strict';
+
+const net = require('net');
+const fs = require('fs');
 
 function Socket(path, successCallback, cmdCallback) {
-    var server = net.createServer();
-	var invokedSuccess = false;
+    let server = net.createServer();
+	let invokedSuccess = false;
 	
 	function invokeSuccess() {
 		if (invokedSuccess) {
@@ -24,19 +26,20 @@ function Socket(path, successCallback, cmdCallback) {
         
         connection.on('data', function(data) {
             //console.log('CONTROL: Got raw data:', data);
-            var text = data.toString();
+            let text = data.toString();
             
-            var lines = text.split('\n').filter(function(val, idx, arr) {
+            let lines = text.split('\n').filter(function(val, idx, arr) {
                 return !!val;
             });
             
             //console.log(lines);
             
-            var i, len = lines.length;
+            let len = lines.length;
             
-            for (i = 0; i < len; ++i) {
-                console.log('CONTROL: Got data:', lines[i]);
-                cmdCallback(lines[i]);
+            for (let i = 0; i < len; ++i) {
+				let line = lines[i];
+                console.log('CONTROL: Got data:', line);
+                cmdCallback(line);
             }
         });
     });
@@ -44,7 +47,7 @@ function Socket(path, successCallback, cmdCallback) {
     server.on('listening', function() {
         console.info('CONTROL: Socket bound');
 
-        fs.chmod(path, 0775, invokeSuccess);
+        fs.chmod(path, parseInt('775', 8), invokeSuccess);
     });
 
     server.on('error', function (e) {

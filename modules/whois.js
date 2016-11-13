@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(ircbot) {
 	ircbot.addListener('whois', function(info) {
 		console.info(info.nick, 'is', info.user + '@' + info.host, '*', info.realname);
