@@ -80,7 +80,7 @@ const controlSocket = new control.Socket(config.socket.path, ircConnect, functio
             }
             
             argsOptional = true;
-            let message = args.join(' ');
+            const message = args.join(' ');
             
             if (message.length) {
                 args = [

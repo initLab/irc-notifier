@@ -4,7 +4,7 @@ const net = require('net');
 const fs = require('fs');
 
 function Socket(path, successCallback, cmdCallback) {
-    let server = net.createServer();
+    const server = net.createServer();
 	let invokedSuccess = false;
 	
 	function invokeSuccess() {

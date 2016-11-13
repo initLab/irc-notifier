@@ -3,7 +3,7 @@
 const request = require('request');
 
 function shortenEventUrl(event, callback) {
-	let url = event.link[0];
+	const url = event.link[0];
 
 	request({
 		url: 'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url)
@@ -19,7 +19,7 @@ function shortenEventUrl(event, callback) {
 }
 
 function isToday(datetime) {
-	let dt = new Date;
+	const dt = new Date;
 
 	return
 		dt.getDate() === datetime.getDate() &&
@@ -71,28 +71,27 @@ module.exports = {
 				}
 
 				// get all events
-				let events = result.rss.channel[0].item;
-				let sortedEvents = [];
+				const events = result.rss.channel[0].item;
 
 				// parse the start time
 				for (let i = 0; i < events.length; ++i) {
-					let ts = Date.parse(events[i].pubDate[0]);
+					const ts = Date.parse(events[i].pubDate[0]);
 					events[i].timestamp = ts;
 					events[i].datetime = new Date(ts);
 				}
 
 				// sort by start time ascending
-				sortedEvents = events.sort(function(a, b) {
-					let key = 'timestamp';
-					let x = a[key], y = b[key];
+				const sortedEvents = events.sort(function(a, b) {
+					const key = 'timestamp';
+					const x = a[key], y = b[key];
 					return ((x < y) ? -1 : ((x > y) ? 1 : 0));
 				});
 
 				// send events to IRC
 				async.map(sortedEvents, shortenEventUrl, function(err, results) {
 					for (let i = 0; i < results.length; ++i) {
-						let event = results[i];
-						let today = isToday(event.datetime);
+						const event = results[i];
+						const today = isToday(event.datetime);
 						
 						// if there are events today, show all of them
 						// if not, show the next one
