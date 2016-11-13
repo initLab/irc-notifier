@@ -27,6 +27,22 @@ function isToday(datetime) {
 		dt.getYear() === datetime.getYear();
 }
 
+function leadingZero(num) {
+	if (num > 9) {
+		return num;
+	}
+	
+	return '0' + num;
+}
+
+function formatDate(datetime) {
+	return leadingZero(datetime.getDate()) + '.' +
+		leadingZero(datetime.getMonth() + 1) + '.' +
+		datetime.getFullYear() + ' ' +
+		leadingZero(datetime.getHours()) + ':' +
+		leadingZero(datetime.getMinutes());
+}
+
 module.exports = {
 	key: 'events',
 	description: 'shows events in init Lab',
@@ -84,7 +100,7 @@ module.exports = {
 							break;
 						}
 
-						ircbot.say(to, '[' + event.datetime.toLocaleString('bg-BG') + '] ' +
+						ircbot.say(to, '[' + formatDate(event.datetime) + '] ' +
 							event.title + ' ' + event.shortUrl);
 					}
 				});
