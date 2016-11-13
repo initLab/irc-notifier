@@ -45,7 +45,7 @@ function formatDate(datetime) {
 
 module.exports = {
 	key: 'events',
-	description: 'shows events in init Lab',
+	description: 'shows events at init Lab',
 	execute: function(ircbot, config, from, to) {
 		request({
 			url: 'https://initlab.org/events/feed/'
