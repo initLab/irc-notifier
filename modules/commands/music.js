@@ -34,7 +34,9 @@ module.exports = {
 			ircbot.say(to, 
 				'[' + states[body.status.state] + '] ' + (
 					body.currentSong.Artist ? (body.currentSong.Artist + ' - ') : ''
-				) + body.currentSong.Title + (
+				) + (
+					body.currentSong.Title || ''
+				) + (
 					body.currentSong.Album ? (' (' + body.currentSong.Album + (
 						body.currentSong.Date ? (', ' + body.currentSong.Date) : ''
 					) + ')') : ''
