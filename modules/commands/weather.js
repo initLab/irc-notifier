@@ -22,7 +22,7 @@ module.exports = {
 			
 			ircbot.say(to, 'Temperature: ' + body.temp_in.toFixed(1) + ' °C in / ' + body.temp_out.toFixed(1) + ' °C out');
 			ircbot.say(to, 'Humidity: ' + body.hum_in.toFixed(0) + ' % in / ' + body.hum_out.toFixed(0) + ' % out');
-			ircbot.say(to, 'Pressure: ' + body.abs_pressure.toFixed(1) + ' hPa');
+			ircbot.say(to, 'Pressure: ' + body.pressure.toFixed(1) + ' hPa');
 		});
 	}
 };
