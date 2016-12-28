@@ -32,7 +32,7 @@ module.exports = {
 			};
 
 			ircbot.say(to, 
-				'[' + states[body.status.state] + '] ' + (
+				'[' + states[body.status.state] + ']' + (body.currentSong ? (' ' + (
 					body.currentSong.Artist ? (body.currentSong.Artist + ' - ') : ''
 				) + (
 					body.currentSong.Title || ''
@@ -40,7 +40,7 @@ module.exports = {
 					body.currentSong.Album ? (' (' + body.currentSong.Album + (
 						body.currentSong.Date ? (', ' + body.currentSong.Date) : ''
 					) + ')') : ''
-				)
+				)) : '')
 			);
 		});
 	}
