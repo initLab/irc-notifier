@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(ircbot, config) {
+module.exports = function(ircbot, config, utils) {
 	const requireDir = require('require-dir');
 	const commands = requireDir('commands');
 	
@@ -11,6 +11,11 @@ module.exports = function(ircbot, config) {
 		
 		Object.keys(commands).forEach(function(key) {
 			const command = commands[key];
+			
+			if (!('key' in command) || !('execute' in command)) {
+				return;
+			}
+			
 			const commandPrefix = '!' + command.key.toLowerCase();
 			const lowercaseMessage = message.toLowerCase();
 			
@@ -18,7 +23,12 @@ module.exports = function(ircbot, config) {
 				return;
 			}
 			
-			command.execute(ircbot, config, from, to, message.substr(commandPrefix.length + 1), commands);
+			try {
+				command.execute(ircbot, config, utils, from, to, message.substr(commandPrefix.length + 1), commands);
+			}
+			catch (e) {
+				ircbot.say(to, 'Error executing command "' + command.key + '": ' + e.message);
+			}
 		});
 	});
 };

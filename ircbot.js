@@ -16,10 +16,12 @@ const ircbot = new irc.Client(
 	config.irc.options
 );
 
+let utils = {};
+
 const modules = requireDir('modules');
 
 Object.keys(modules).forEach(function(key) {
-	modules[key](ircbot, config);
+	modules[key](ircbot, config, utils);
 });
 
 function ircConnect() {

@@ -3,7 +3,7 @@
 module.exports = {
 	key: 'auth',
 	description: 'checks if user is logged in',
-	execute: function(ircbot, config, from, to, message) {
+	execute: function(ircbot, config, utils, from, to, message) {
 		ircbot.whois(from, function(info) {
 			if ('account' in info) {
 				ircbot.say(to, from + ' is logged in as ' + info.account);

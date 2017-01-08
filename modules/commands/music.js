@@ -3,25 +3,10 @@
 module.exports = {
 	key: 'music',
 	description: 'shows current music track',
-	execute: function(ircbot, config, from, to) {
-		const request = require('request');
-		
-		request({
-			url: 'http://spitfire.initlab.org:8989/status',
-			json: true
-		}, function(error, response, body) {
-			if (error !== null) {
-				ircbot.say(to, error.reason ? ('Request error: ' + error.reason) : error.toString());
-				return;
-			}
-			
-			if (response && response.statusCode !== 200) {
-				ircbot.say(to, 'Error getting data, status code=' + response.statusCode);
-				return;
-			}
-			
-			if (body.error) {
-				ircbot.say('Error reading music status: ' + body.error);
+	execute: function(ircbot, config, utils, from, to) {
+		utils.getJson('http://spitfire.initlab.org:8989/status', function(data) {
+			if (data.error) {
+				ircbot.say('Error reading music status: ' + data.error);
 				return;
 			}
 			
@@ -32,16 +17,18 @@ module.exports = {
 			};
 
 			ircbot.say(to, 
-				'[' + states[body.status.state] + ']' + (body.currentSong ? (' ' + (
-					body.currentSong.Artist ? (body.currentSong.Artist + ' - ') : ''
+				'[' + states[data.status.state] + ']' + (data.currentSong ? (' ' + (
+					data.currentSong.Artist ? (data.currentSong.Artist + ' - ') : ''
 				) + (
-					body.currentSong.Title || ''
+					data.currentSong.Title || ''
 				) + (
-					body.currentSong.Album ? (' (' + body.currentSong.Album + (
-						body.currentSong.Date ? (', ' + body.currentSong.Date) : ''
+					data.currentSong.Album ? (' (' + data.currentSong.Album + (
+						data.currentSong.Date ? (', ' + data.currentSong.Date) : ''
 					) + ')') : ''
 				)) : '')
 			);
+		}, function(error) {
+			ircbot.say(to, error);
 		});
 	}
 };
