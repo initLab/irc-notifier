@@ -37,13 +37,15 @@ module.exports = {
 			if ('process' in config && 'startupScript' in config.process) {
 				ircbot.say(to, 'Updated successfully, restarting...');
 				
-				const newInstance = child_process.spawn(config.process.startupScript, {
-					stdio: 'ignore',
-					detached: true
-				});
-				
-				newInstance.unref();
-				process.exit();
+				setTimeout(function() {
+					const newInstance = child_process.spawn(config.process.startupScript, {
+						stdio: 'ignore',
+						detached: true
+					});
+					
+					newInstance.unref();
+					process.exit();
+				}, 100);
 			}
 			else {
 				ircbot.say(to, 'Updated successfully, please restart.');
