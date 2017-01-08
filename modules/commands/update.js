@@ -45,7 +45,7 @@ module.exports = {
 					
 					newInstance.unref();
 					process.exit();
-				}, 100);
+				}, 1000);
 			}
 			else {
 				ircbot.say(to, 'Updated successfully, please restart.');
