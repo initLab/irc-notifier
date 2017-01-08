@@ -2,27 +2,6 @@
 
 module.exports = function(ircbot) {
 	// Whois
-	let whoisData = {};
-
-	ircbot.addListener('raw', function(message) {
-		if (['338', '671'].indexOf(message.rawCommand) === -1) {
-			return;
-		}
-
-		if (!(message.args[1] in whoisData)) {
-			whoisData[message.args[1]] = [];
-		}
-
-		switch (message.rawCommand) {
-			case '338':
-				whoisData[message.args[1]].push(message.args[3] + ' ' + message.args[2]);
-				break;
-			case '671':
-				whoisData[message.args[1]].push(message.args[2]);
-				break;
-		}
-	});
-
 	ircbot.addListener('whois', function(info) {
 		console.info(info.nick, 'is', info.user + '@' + info.host, '*', info.realname);
 		console.info(info.nick, 'on', info.channels.join(' '));
@@ -32,21 +11,27 @@ module.exports = function(ircbot) {
 			console.info(info.nick, 'is away:', info.away);
 		}
 
-		if (info.nick in whoisData) {
-			whoisData[info.nick].forEach(function(msg) {
-				console.info(info.nick, msg);
-			});
+		if ('secure_connection' in info) {
+			console.info(info.nick, 'is using a secure connection');
 		}
-		
-		console.info(info.nick, 'has been idle', info.idle + 's');
+
+		if ('actual_host' in info) {
+			console.info(info.nick, 'actually using host', info.actual_host);
+		}
+
+		if ('idle' in info || 'signon' in info) {
+			console.info(info.nick,
+				(info.idle ? ('has been idle' + info.idle + 'sec') : '') +
+				(info.idle && info.signon ? ', ' : '') +
+				(info.signon ? ('signed on ' + info.signon) : '')
+			);
+		}
 		
 		if ('account' in info && 'accountinfo' in info) {
 			console.info(info.nick, info.accountinfo, info.account);
 		}
 
 		console.info(info.nick, 'End of /WHOIS list.');
-
-		delete whoisData[info.nick];
 	});
 
 	// Channel list
