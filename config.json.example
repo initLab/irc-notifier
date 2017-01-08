@@ -19,4 +19,7 @@
 		},
 		"announceChannel": "#example"
 	}
+	"process": {
+		"startupScript": "/home/user/ircBot/start.sh"
+	}
 }
