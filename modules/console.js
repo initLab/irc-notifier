@@ -4,7 +4,11 @@ module.exports = function(ircbot) {
 	// Whois
 	ircbot.addListener('whois', function(info) {
 		console.info(info.nick, 'is', info.user + '@' + info.host, '*', info.realname);
-		console.info(info.nick, 'on', info.channels.join(' '));
+		
+		if ('channels' in info) {
+			console.info(info.nick, 'on', info.channels.join(' '));
+		}
+		
 		console.info(info.nick, 'using', info.server, info.serverinfo);
 		
 		if ('away' in info) {
