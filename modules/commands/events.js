@@ -39,7 +39,7 @@ function formatDate(datetime) {
 module.exports = {
 	key: 'events',
 	description: 'shows events at init Lab',
-	execute: function(ircbot, config, utils, from, to) {
+	execute: function(ircbot, config, utils, replyTo) {
 		utils.getXml('https://initlab.org/events/feed/', function(data) {
 			const async = require('async');
 			
@@ -79,19 +79,19 @@ module.exports = {
 			// send to IRC
 			async.map(selectedEvents, (event, callback) => shortenEventUrl(event, callback, utils), function(err, results) {
 				if (err !== null) {
-					ircbot.say(to, err);
+					ircbot.say(replyTo, err);
 					return false;
 				}
 				
 				for (let i = 0; i < results.length; ++i) {
 					const event = results[i];
 					
-					ircbot.say(to, '[' + formatDate(event.datetime) + '] ' +
+					ircbot.say(replyTo, '[' + formatDate(event.datetime) + '] ' +
 						event.title + ' ' + (event.shortUrl));
 				}
 			});
 		}, function (error) {
-			ircbot.say(to, error);
+			ircbot.say(replyTo, error);
 		});
 	}
 };

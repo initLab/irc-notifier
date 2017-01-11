@@ -3,7 +3,7 @@
 module.exports = {
 	key: 'update',
 	description: 'updates the bot',
-	execute: function(ircbot, config, utils, from, to, message, commands) {
+	execute: function(ircbot, config, utils, replyTo) {
 		const child_process = require('child_process');
 
 		let needsUpdate = true;
@@ -13,7 +13,7 @@ module.exports = {
 		});
 		
 		git.stdout.on('data', (data) => {
-			ircbot.say(to, data);
+			ircbot.say(replyTo, data);
 			
 			if (data.toString() === 'Already up-to-date.\n') {
 				needsUpdate = false;
@@ -21,12 +21,12 @@ module.exports = {
 		});
 
 		git.stderr.on('data', (data) => {
-			ircbot.say(to, data);
+			ircbot.say(replyTo, data);
 		});
 		
 		git.on('close', (code) => {
 			if (code !== 0) {
-				ircbot.say(to, `Failed to update: child process exited with code ${code}`);
+				ircbot.say(replyTo, `Failed to update: child process exited with code ${code}`);
 				return;
 			}
 			
@@ -35,7 +35,7 @@ module.exports = {
 			}
 			
 			if ('process' in config && 'startupScript' in config.process) {
-				ircbot.say(to, 'Updated successfully, restarting...');
+				ircbot.say(replyTo, 'Updated successfully, restarting...');
 				
 				setTimeout(function() {
 					const newInstance = child_process.spawn(config.process.startupScript, {
@@ -48,12 +48,12 @@ module.exports = {
 				}, 1000);
 			}
 			else {
-				ircbot.say(to, 'Updated successfully, please restart.');
+				ircbot.say(replyTo, 'Updated successfully, please restart.');
 			}
 		});
 		
 		git.on('error', (err) => {
-			ircbot.say(to, `Failed to update: ${err}`);
+			ircbot.say(replyTo, `Failed to update: ${err}`);
 		});
 	}
 };

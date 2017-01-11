@@ -3,7 +3,7 @@
 module.exports = {
 	key: 'music',
 	description: 'shows current music track',
-	execute: function(ircbot, config, utils, from, to) {
+	execute: function(ircbot, config, utils, replyTo) {
 		utils.getJson('http://spitfire.initlab.org:8989/status', function(data) {
 			if (data.error) {
 				ircbot.say('Error reading music status: ' + data.error);
@@ -16,7 +16,7 @@ module.exports = {
 				stop: 'stopped',
 			};
 
-			ircbot.say(to, 
+			ircbot.say(replyTo, 
 				'[' + states[data.status.state] + ']' + (data.currentSong ? (' ' + (
 					data.currentSong.Artist ? (data.currentSong.Artist + ' - ') : ''
 				) + (
@@ -28,7 +28,7 @@ module.exports = {
 				)) : '')
 			);
 		}, function(error) {
-			ircbot.say(to, error);
+			ircbot.say(replyTo, error);
 		});
 	}
 };

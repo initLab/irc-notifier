@@ -3,20 +3,20 @@
 module.exports = {
 	key: 'who',
 	description: 'shows present users',
-	execute: function(ircbot, config, utils, from, to, message) {
-		if (message.toLowerCase() === 'let the dogs out') {
-			ircbot.say(to, 'Who? Who? Who? Who? https://youtu.be/Qkuu0Lwb5EM');
+	execute: function(ircbot, config, utils, replyTo, sender, text) {
+		if (text.toLowerCase() === 'let the dogs out') {
+			ircbot.say(replyTo, 'Who? Who? Who? Who? https://youtu.be/Qkuu0Lwb5EM');
 			return;
 		}
 		
-		if (message.toLowerCase() === 'the fuck is alice') {
-			ircbot.say(to, 'https://youtu.be/bUy83PKjkOI');
+		if (text.toLowerCase() === 'the fuck is alice') {
+			ircbot.say(replyTo, 'https://youtu.be/bUy83PKjkOI');
 			return;
 		}
 		
 		utils.getJson('https://fauna.initlab.org/api/users/present.json', function(data) {
 			if (data.length === 0) {
-				ircbot.say(to, 'No one in init Lab :(');
+				ircbot.say(replyTo, 'No one in init Lab :(');
 				return;
 			}
 
@@ -43,9 +43,9 @@ module.exports = {
 				people.push(mystery_str);
 			}
 			
-			ircbot.say(to, 'People in init Lab: ' + people.join(', '));
+			ircbot.say(replyTo, 'People in init Lab: ' + people.join(', '));
 		}, function(error) {
-			ircbot.say(to, error);
+			ircbot.say(replyTo, error);
 		});
 	}
 };

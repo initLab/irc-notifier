@@ -3,9 +3,9 @@
 module.exports = {
 	key: 'help',
 	description: 'shows help',
-	execute: function(ircbot, config, utils, from, to, message, commands) {
-		ircbot.say(to, 'Available commands: ' + Object.keys(commands).map(function(key) {
-			return '!' + commands[key].key + ' - ' + commands[key].description;
+	execute: function(ircbot, config, utils, replyTo, sender, text, commands) {
+		ircbot.say(replyTo, 'Available commands: ' + Object.keys(commands).map(function(key) {
+			return '!' + commands[key].key + ': ' + commands[key].description;
 		}).join(', '));
 	}
 };

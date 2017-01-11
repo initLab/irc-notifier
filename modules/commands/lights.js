@@ -3,11 +3,11 @@
 module.exports = {
 	key: 'lights',
 	description: 'shows lights status',
-	execute: function(ircbot, config, utils, from, to) {
+	execute: function(ircbot, config, utils, replyTo) {
 		utils.getJson('https://fauna.initlab.org/api/lights/status.json', function(data) {
-			ircbot.say(to, 'Lights are ' + data.status + ', policy is ' + data.policy);
+			ircbot.say(replyTo, 'Lights are ' + data.status + ', policy is ' + data.policy);
 		}, function(error) {
-			ircbot.say(to, error);
+			ircbot.say(replyTo, error);
 		});
 	}
 };
