@@ -28,11 +28,39 @@ module.exports = function(ircbot, config, utils) {
 		});
 	}
 	
-	ircbot.addListener('message' + config.irc.announceChannel, function(sender, text) {
-		executeCommand(sender, config.irc.announceChannel, text);
+	function bindEvents() {
+		ircbot.addListener('message' + config.irc.announceChannel, function(sender, text) {
+			executeCommand(sender, config.irc.announceChannel, text);
+		});
+		
+		ircbot.addListener('pm', function(sender, text) {
+			executeCommand(sender, sender, text);
+		});
+	}
+	
+	function processConstructor() {
+		if (constructors.length === 0) {
+			console.log('Commands initialised');
+			bindEvents();
+			return;
+		}
+
+		(constructors.shift())(config, utils, processConstructor);
+	}
+	
+	let constructors = [];
+	
+	Object.keys(commands).forEach(function(key) {
+		const command = commands[key];
+		
+		if (!('init' in command)) {
+			return;
+		}
+		
+		constructors.push(command.init);
 	});
 	
-	ircbot.addListener('pm', function(sender, text) {
-		executeCommand(sender, sender, text);
-	});
+	console.log('Initialising commands...');
+	
+	processConstructor();
 };
