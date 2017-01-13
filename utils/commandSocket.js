@@ -3,20 +3,10 @@
 const net = require('net');
 const fs = require('fs');
 
-function Socket(path, successCallback, cmdCallback) {
+function Socket(path, cmdCallback) {
     const server = net.createServer();
 	let invokedSuccess = false;
 	
-	function invokeSuccess() {
-		if (invokedSuccess) {
-			return;
-		}
-		
-		invokedSuccess = true;
-		
-		successCallback();
-	}
-    
     server.on('connection', function(connection) {
         console.info('CONTROL: Socket open');
         
@@ -47,7 +37,7 @@ function Socket(path, successCallback, cmdCallback) {
     server.on('listening', function() {
         console.info('CONTROL: Socket bound');
 
-        fs.chmod(path, parseInt('775', 8), invokeSuccess);
+        fs.chmod(path, parseInt('775', 8));
     });
 
     server.on('error', function (e) {
@@ -64,8 +54,7 @@ function Socket(path, successCallback, cmdCallback) {
             break;
         }
 		
-		console.warn('Starting without control socket...');
-		invokeSuccess();
+		console.warn('Starting without control socket');
     });
 
     function bindSocket() {

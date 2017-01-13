@@ -6,7 +6,7 @@
 		"server": "irc.example.com",
 		"nickname": "notifier",
 		"options": {
-			"autoConnect": false,
+			"autoConnect": true,
 			"channels": [
 				"#example"
 			],
