@@ -21,5 +21,11 @@
 	}
 	"process": {
 		"startupScript": "/home/user/ircBot/start.sh"
+	},
+	"http": {
+		"listen": {
+			"host": "::",
+			"port": 1234
+		}
 	}
 }
