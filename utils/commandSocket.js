@@ -54,7 +54,7 @@ function Socket(path, cmdCallback) {
             break;
         }
 		
-		console.warn('Starting without control socket');
+		console.warn('CONTROL: Starting without control socket');
     });
 
     function bindSocket() {

@@ -8,9 +8,9 @@ function leadingZero(num) {
 	return '0' + num;
 }
 
-function log(line) {
+function log() {
 	const dt = new Date;
-	const args = [line];
+	let args = Array.from(arguments);
 	
 	args.unshift(
 		'[' +

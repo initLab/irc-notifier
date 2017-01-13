@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = function(ircbot, config, utils) {
+	const logger = utils.logger.log;
+	
 	function commandCallback(line) {
 		let args = line.split(' ');
 		let cmd = args.shift().toLowerCase();
@@ -90,11 +92,11 @@ module.exports = function(ircbot, config, utils) {
 		}
 		
 		if (knownCmd) {
-			console.info('CMD: got CMD', cmd, 'ARGS', args);
+			logger('CMD: got CMD', cmd, 'ARGS', args);
 			
 			if (sendCmd) {
 				if (args.length === 0 && !argsOptional) {
-					console.warn('CMD: not enough arguments');
+					logger('CMD: not enough arguments');
 					return;
 				}
 				
@@ -102,12 +104,12 @@ module.exports = function(ircbot, config, utils) {
 			}
 		}
 		else {
-			console.error('CMD: unknown CMD', cmd, 'ARGS', args);
+			logger('CMD: unknown CMD', cmd, 'ARGS', args);
 		}
 	}
 	
 	if (!('socket' in config) || !('path' in config.socket)) {
-		console.warn('Starting without control socket');
+		logger('Starting without control socket');
 		return;
 	}
 	
