@@ -25,7 +25,7 @@ module.exports = function(ircbot) {
 
 		if ('idle' in info || 'signon' in info) {
 			console.info(info.nick,
-				(info.idle ? ('has been idle' + info.idle + 'sec') : '') +
+				(info.idle ? ('has been idle ' + info.idle + 'sec') : '') +
 				(info.idle && info.signon ? ', ' : '') +
 				(info.signon ? ('signed on ' + info.signon) : '')
 			);
