@@ -9,7 +9,7 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 				throw error;
 			}
 			
-			if (response && response.statusCode !== 200) {
+			if (response && response.statusCode < 400) {
 				throw new Error('Error getting data, status code=' + response.statusCode);
 			}
 			
@@ -46,6 +46,16 @@ function getJson(url, onSuccess, onError) {
 	}, onSuccess, onError);
 }
 
+function getJsonOAuth2(url, token, onSuccess, onError) {
+	return makeRequest({
+		url: url,
+		json: true,
+		auth: {
+			bearer: token
+		}
+	}, onSuccess, onError);
+}
+
 function getXml(url, onSuccess, onError) {
 	return makeRequest({
 		url: url,
@@ -54,8 +64,23 @@ function getXml(url, onSuccess, onError) {
 	});
 }
 
+function postJsonOAuth2(url, data, token, onSuccess, onError) {
+	return makeRequest({
+		method: 'POST',
+		url: url,
+		auth: {
+			bearer: token
+		},
+		form: data
+	}, function(body) {
+		onSuccess.apply(this, JSON.parse(body));
+	}, onError);
+}
+
 module.exports = {
 	get: get,
 	getJson: getJson,
-	getXml: getXml
+	getJsonOAuth2: getJsonOAuth2,
+	getXml: getXml,
+	postJsonOAuth2: postJsonOAuth2
 };
