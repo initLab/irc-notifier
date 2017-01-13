@@ -14,7 +14,7 @@ module.exports = {
 			return;
 		}
 		
-		utils.getJson('https://fauna.initlab.org/api/users/present.json', function(data) {
+		utils.request.getJson('https://fauna.initlab.org/api/users/present.json', function(data) {
 			if (data.length === 0) {
 				ircbot.say(replyTo, 'No one in init Lab :(');
 				return;

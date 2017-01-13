@@ -16,8 +16,7 @@ const ircbot = new irc.Client(
 	config.irc.options
 );
 
-let utils = {};
-
+const utils = requireDir('utils');
 const modules = requireDir('modules');
 
 Object.keys(modules).forEach(function(key) {

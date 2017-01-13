@@ -4,7 +4,7 @@ module.exports = {
 	key: 'outside',
 	description: 'shows outside weather',
 	execute: function(ircbot, config, utils, replyTo) {
-		utils.getJson('https://api.thingspeak.com/channels/132452/feeds.json?days=1&results=1', function(data) {
+		utils.request.getJson('https://api.thingspeak.com/channels/132452/feeds.json?days=1&results=1', function(data) {
 			if (data.feeds.length === 0) {
 				ircbot.say(replyTo, 'Error: no data');
 				return;

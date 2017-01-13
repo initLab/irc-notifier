@@ -4,7 +4,7 @@ module.exports = {
 	key: 'music',
 	description: 'shows current music track',
 	execute: function(ircbot, config, utils, replyTo) {
-		utils.getJson('http://spitfire.initlab.org:8989/status', function(data) {
+		utils.request.getJson('http://spitfire.initlab.org:8989/status', function(data) {
 			if (data.error) {
 				ircbot.say('Error reading music status: ' + data.error);
 				return;

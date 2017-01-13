@@ -3,7 +3,7 @@
 function shortenEventUrl(event, callback, utils) {
 	const url = event.link[0];
 
-	utils.get('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url), function(data) {
+	utils.request.get('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url), function(data) {
 		event.shortUrl = data;
 		callback(null, event);
 	}, function(error) {
@@ -40,7 +40,7 @@ module.exports = {
 	key: 'events',
 	description: 'shows events at init Lab',
 	execute: function(ircbot, config, utils, replyTo) {
-		utils.getXml('https://initlab.org/events/feed/', function(data) {
+		utils.request.getXml('https://initlab.org/events/feed/', function(data) {
 			const async = require('async');
 			
 			// get all events

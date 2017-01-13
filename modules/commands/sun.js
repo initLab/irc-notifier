@@ -51,7 +51,7 @@ module.exports = {
 	key: 'sun',
 	description: 'shows sunrise/sunset time',
 	execute: function(ircbot, config, utils, replyTo) {
-		utils.getJson('http://api.sunrise-sunset.org/json?lat=42.70789247&lng=23.32527086&formatted=0', function(data) {
+		utils.request.getJson('http://api.sunrise-sunset.org/json?lat=42.70789247&lng=23.32527086&formatted=0', function(data) {
 			if (data.status !== 'OK') {
 				ircbot.say('Error in response');
 				return;
