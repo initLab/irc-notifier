@@ -3,7 +3,7 @@
 module.exports = {
 	key: 'update',
 	description: 'updates the bot',
-	execute: function(ircbot, config, utils, replyTo) {
+	execute: function(ircbot, config, utils, replyTo, sender) {
 		const child_process = require('child_process');
 
 		let needsUpdate = true;
@@ -13,15 +13,17 @@ module.exports = {
 		});
 		
 		git.stdout.on('data', (data) => {
-			ircbot.say(replyTo, data);
-			
 			if (data.toString() === 'Already up-to-date.\n') {
 				needsUpdate = false;
+				ircbot.say(replyTo, data);
+			}
+			else {
+				ircbot.notice(sender, data);
 			}
 		});
 
 		git.stderr.on('data', (data) => {
-			ircbot.say(replyTo, data);
+			ircbot.notice(sender, data);
 		});
 		
 		git.on('close', (code) => {
