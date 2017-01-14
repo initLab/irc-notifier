@@ -120,11 +120,11 @@ function deauth(ircbot, replyTo, sender) {
 
 function executeCommand(ircbot, config, utils, replyTo, sender, cmd) {
 	getUserToken(ircbot, config, replyTo, sender, function(token, accountName) {
-		utils.request.postJsonOAuth2(config.fauna.urls.actions.door, {
+		utils.request.postOAuth2(config.fauna.urls.actions.door, {
 			door_action: {
 				name: cmd
 			}
-		}, token.token.access_token, function(data) {
+		}, token.token.access_token, function() {
 			ircbot.say(replyTo, 'Action ' + cmd + ' successful');
 		}, function(error) {
 			ircbot.say(replyTo, 'Failed executing action: ' + error);

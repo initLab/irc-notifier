@@ -64,7 +64,7 @@ function getXml(url, onSuccess, onError) {
 	});
 }
 
-function postJsonOAuth2(url, data, token, onSuccess, onError) {
+function postOAuth2(url, data, token, onSuccess, onError) {
 	return makeRequest({
 		method: 'POST',
 		url: url,
@@ -72,9 +72,7 @@ function postJsonOAuth2(url, data, token, onSuccess, onError) {
 			bearer: token
 		},
 		form: data
-	}, function(body) {
-		onSuccess.apply(this, JSON.parse(body));
-	}, onError);
+	}, onSuccess, onError);
 }
 
 module.exports = {
@@ -82,5 +80,5 @@ module.exports = {
 	getJson: getJson,
 	getJsonOAuth2: getJsonOAuth2,
 	getXml: getXml,
-	postJsonOAuth2: postJsonOAuth2
+	postOAuth2: postOAuth2
 };
