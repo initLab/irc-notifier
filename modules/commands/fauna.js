@@ -8,10 +8,10 @@ function setAccessToken(ircbot, sender, accountName, token) {
 		token: token
 	};
 
-	ircbot.say(sender, 'Authentication successful!');
+	ircbot.notice(sender, 'Authorization successful!');
 }
 
-function getAccountName(ircbot, replyTo, sender, callback) {
+function getAccountName(ircbot, sender, callback) {
 	ircbot.remoteWhois(sender, function(info) {
 		if (!('secure_connection' in info)) {
 			ircbot.notice(sender, sender + ': This command only works over secure IRC connections');
@@ -49,8 +49,8 @@ function getAuthURL(config, sender, accountName, callback) {
 	});
 }
 
-function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound) {
-	getAccountName(ircbot, replyTo, sender, function(accountName) {
+function checkUserToken(ircbot, sender, callbackFound, callbackNotFound) {
+	getAccountName(ircbot, sender, function(accountName) {
 		if (!(accountName in authState) || !('token' in authState[accountName])) {
 			return callbackNotFound(accountName);
 		}
@@ -58,7 +58,7 @@ function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound
 		let token = authState[accountName].token;
 
 		if (token.expired()) {
-			ircbot.say(sender, 'Your token has expired, trying to refresh...');
+			ircbot.notice(sender, 'Your token has expired, trying to refresh...');
 
 			return token.refresh((error, token) => {
 				setAccessToken(ircbot, sender, accountName, token);
@@ -70,14 +70,13 @@ function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound
 	});
 }
 
-function getUserToken(ircbot, config, replyTo, sender, callback) {
-	checkUserToken(ircbot, replyTo, sender, callback, function(accountName) {
+function getUserToken(ircbot, config, sender, callback) {
+	checkUserToken(ircbot, sender, callback, function(accountName) {
 		return getAuthURL(config, sender, accountName, function(authorizationURL) {
-			ircbot.notice(sender, 'You are not authorized - please follow the instructions in the private message');
-			ircbot.say(sender, 'Please authorize the bot to Fauna: ' + authorizationURL);
+			ircbot.notice(sender, 'To use this bot, please link your IRC account with Fauna here: ' + authorizationURL);
 			
 			if (config.fauna.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
-				ircbot.say(sender, 'After you receive the code, please enter it here, in the following format: !fauna auth <your code here>');
+				ircbot.notice(sender, 'After you receive the code, please enter it using the following command: /msg ' + ircbot.nick + ' !fauna auth <your code here>');
 			}
 		});
 	});
@@ -89,7 +88,7 @@ function getAccessToken(ircbot, config, sender, accountName, code) {
 		redirect_uri: config.fauna.oauth2.authParams.redirect_uri
 	}, (error, result) => {
 		if (error) {
-			return ircbot.say(sender, 'Access Token Error: ' + error.message);
+			return ircbot.notice(sender, 'Access Token Error: ' + error.message);
 		}
 
 		const token = oauth2.accessToken.create(result);
@@ -98,14 +97,14 @@ function getAccessToken(ircbot, config, sender, accountName, code) {
 	});
 }
 
-function auth(ircbot, config, replyTo, sender, code) {
-	getAccountName(ircbot, replyTo, sender, function(accountName) {
+function auth(ircbot, config, sender, code) {
+	getAccountName(ircbot, sender, function(accountName) {
 		getAccessToken(ircbot, config, sender, accountName, code);
 	});
 }
 
-function deauth(ircbot, replyTo, sender) {
-	checkUserToken(ircbot, replyTo, sender, function(token, accountName) {
+function deauth(ircbot, sender) {
+	checkUserToken(ircbot, sender, function(token, accountName) {
 		token.revoke('access_token', (error) => {
 			if (error) {
 				ircbot.notice(sender, 'Error revoking access token: ' + error.message);
@@ -127,8 +126,8 @@ function deauth(ircbot, replyTo, sender) {
 	});
 }
 
-function executeCommand(ircbot, config, utils, replyTo, sender, cmd) {
-	getUserToken(ircbot, config, replyTo, sender, function(token, accountName) {
+function executeCommand(ircbot, config, utils, sender, cmd) {
+	getUserToken(ircbot, config, sender, function(token, accountName) {
 		utils.request.postOAuth2(config.fauna.urls.actions.door, {
 			door_action: {
 				name: cmd
@@ -136,7 +135,7 @@ function executeCommand(ircbot, config, utils, replyTo, sender, cmd) {
 		}, token.token.access_token, function() {
 			ircbot.notice(sender, 'Action ' + cmd + ' successful');
 		}, function(error) {
-			ircbot.say(replyTo, 'Failed executing action: ' + error);
+			ircbot.notice(sender, 'Failed executing action: ' + error);
 		});
 	});
 }
@@ -145,19 +144,19 @@ function showHelp(ircbot, replyTo) {
 	ircbot.say(replyTo, 'Subcommands list: open/lock/unlock - control door, deauth - revoke tokens, info - show your account info, help - show this help');
 }
 
-function showInfo(ircbot, config, utils, replyTo, sender) {
-	getUserToken(ircbot, config, replyTo, sender, function(token, accountName) {
+function showInfo(ircbot, config, utils, sender) {
+	getUserToken(ircbot, config, sender, function(token, accountName) {
 		utils.request.getJsonOAuth2(config.fauna.urls.resourceOwner, token.token.access_token, function(data) {
-			ircbot.notice(sender, sender + ' is logged in to IRC as ' + accountName + ' and has linked the following Fauna account:');
-			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + data.roles.join(', '));
+			ircbot.notice(sender, 'You are logged in to IRC as ' + accountName + ' and have linked the following Fauna account:');
+			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + (data.roles.join(', ') || '<none>'));
 		}, function(error) {
-			ircbot.say(replyTo, 'Failed getting user info: ' + error);
+			ircbot.notice(sender, 'Failed getting user info: ' + error);
 		});
 	});
 }
 
-function showInvalidCommand(ircbot, sender) {
-	ircbot.notice(sender, 'Invalid subcommand, try !fauna help');
+function showInvalidCommand(ircbot, replyTo) {
+	ircbot.say(replyTo, 'Invalid subcommand, try !fauna help');
 }
 
 module.exports = {
@@ -233,28 +232,28 @@ module.exports = {
 		
 		const authPrefix = 'auth ';
 		if (text.indexOf(authPrefix) === 0) {
-			auth(ircbot, config, replyTo, sender, text.substr(authPrefix.length));
+			auth(ircbot, config, sender, text.substr(authPrefix.length));
 			return;
 		}
 
 		switch (text) {
 			case 'deauth':
-				deauth(ircbot, replyTo, sender);
+				deauth(ircbot, sender);
 				break;
 			case 'open':
 			case 'lock':
 			case 'unlock':
-				executeCommand(ircbot, config, utils, replyTo, sender, text);
+				executeCommand(ircbot, config, utils, sender, text);
 				break;
 			case 'help':
 				showHelp(ircbot, replyTo);
 				break;
 			case 'info':
 			case '':
-				showInfo(ircbot, config, utils, replyTo, sender);
+				showInfo(ircbot, config, utils, sender);
 				break;
 			default:
-				showInvalidCommand(ircbot, sender);
+				showInvalidCommand(ircbot, replyTo);
 				break;
 		}
 	}
