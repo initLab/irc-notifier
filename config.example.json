@@ -17,7 +17,11 @@
 			"showErrors": true,
 			"userName": "ircbot"
 		},
-		"announceChannel": "#example"
+		"announceChannel": "#example",
+		"account": {
+			"username": "notifier",
+			"password": "example"
+		}
 	}
 	"process": {
 		"startupScript": "/home/user/ircBot/start.sh"
