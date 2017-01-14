@@ -14,12 +14,12 @@ function setAccessToken(ircbot, sender, accountName, token) {
 function getAccountName(ircbot, replyTo, sender, callback) {
 	ircbot.remoteWhois(sender, function(info) {
 		if (!('secure_connection' in info)) {
-			ircbot.say(replyTo, sender + ': This command only works over secure IRC connections');
+			ircbot.notice(sender, sender + ': This command only works over secure IRC connections');
 			return;
 		}
 
 		if (!('account' in info)) {
-			ircbot.say(replyTo, sender + ': You are not logged in to IRC services. Please login and retry.');
+			ircbot.notice(sender, sender + ': You are not logged in to IRC services. Please login and retry.');
 			return;
 		}
 
@@ -73,7 +73,7 @@ function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound
 function getUserToken(ircbot, config, replyTo, sender, callback) {
 	checkUserToken(ircbot, replyTo, sender, callback, function(accountName) {
 		return getAuthURL(config, sender, accountName, function(authorizationURL) {
-			ircbot.say(replyTo, 'You are not authorized - please follow the instructions in the private message');
+			ircbot.notice(sender, 'You are not authorized - please follow the instructions in the private message');
 			ircbot.say(sender, 'Please authorize the bot to Fauna: ' + authorizationURL);
 			
 			if (config.fauna.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
@@ -108,22 +108,22 @@ function deauth(ircbot, replyTo, sender) {
 	checkUserToken(ircbot, replyTo, sender, function(token, accountName) {
 		token.revoke('access_token', (error) => {
 			if (error) {
-				ircbot.say(replyTo, 'Error revoking access token: ' + error.message);
+				ircbot.notice(sender, 'Error revoking access token: ' + error.message);
 				return;
 			}
 
 			token.revoke('refresh_token', (error) => {
 				if (error) {
-					ircbot.say(replyTo, 'Error revoking refresh token: ' + error.message);
+					ircbot.notice(sender, 'Error revoking refresh token: ' + error.message);
 					return;
 				}
 
 				delete authState[accountName];
-				ircbot.say(replyTo, 'Access tokens revoked successfully');
+				ircbot.notice(sender, 'Access tokens revoked successfully');
 			});
 		});
 	}, function() {
-		ircbot.say(replyTo, 'You are not authorized, so there\'s nothing to revoke');
+		ircbot.notice(sender, 'You are not authorized, so there\'s nothing to revoke');
 	});
 }
 
@@ -134,7 +134,7 @@ function executeCommand(ircbot, config, utils, replyTo, sender, cmd) {
 				name: cmd
 			}
 		}, token.token.access_token, function() {
-			ircbot.say(replyTo, 'Action ' + cmd + ' successful');
+			ircbot.notice(sender, 'Action ' + cmd + ' successful');
 		}, function(error) {
 			ircbot.say(replyTo, 'Failed executing action: ' + error);
 		});
@@ -148,16 +148,16 @@ function showHelp(ircbot, replyTo) {
 function showInfo(ircbot, config, utils, replyTo, sender) {
 	getUserToken(ircbot, config, replyTo, sender, function(token, accountName) {
 		utils.request.getJsonOAuth2(config.fauna.urls.resourceOwner, token.token.access_token, function(data) {
-			ircbot.say(replyTo, sender + ' is logged in to IRC as ' + accountName + ' and has linked the following Fauna account:');
-			ircbot.say(replyTo, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + data.roles.join(', '));
+			ircbot.notice(sender, sender + ' is logged in to IRC as ' + accountName + ' and has linked the following Fauna account:');
+			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + data.roles.join(', '));
 		}, function(error) {
 			ircbot.say(replyTo, 'Failed getting user info: ' + error);
 		});
 	});
 }
 
-function showInvalidCommand(ircbot, replyTo) {
-	ircbot.say(replyTo, 'Invalid subcommand, try !fauna help');
+function showInvalidCommand(ircbot, sender) {
+	ircbot.notice(sender, 'Invalid subcommand, try !fauna help');
 }
 
 module.exports = {
@@ -254,7 +254,7 @@ module.exports = {
 				showInfo(ircbot, config, utils, replyTo, sender);
 				break;
 			default:
-				showInvalidCommand(ircbot, replyTo);
+				showInvalidCommand(ircbot, sender);
 				break;
 		}
 	}
