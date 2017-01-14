@@ -62,7 +62,7 @@ function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound
 
 			return token.refresh((error, token) => {
 				setAccessToken(ircbot, sender, accountName, token);
-				callback(token, accountName);
+				callbackFound(token, accountName);
 			});
 		}
 
