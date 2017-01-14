@@ -3,10 +3,10 @@
 'use strict';
 
 const irc = require('irc');
-const fs = require('fs');
 const requireDir = require('require-dir');
+const utils = requireDir('utils');
 
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+const config = utils.file.readJson('config.json');
 
 const ircbot = new irc.Client(
 	config.irc.server,
@@ -14,7 +14,6 @@ const ircbot = new irc.Client(
 	config.irc.options
 );
 
-const utils = requireDir('utils');
 const modules = requireDir('modules');
 
 Object.keys(modules).forEach(function(key) {
