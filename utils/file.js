@@ -7,7 +7,7 @@ function readJson(path) {
 }
 
 function writeJson(path, obj) {
-	fs.writeFileSync(path, JSON.stringify(obj), {
+	fs.writeFileSync(path, JSON.stringify(obj) + '\n', {
 		mode: 0o600
 	});
 }
