@@ -75,7 +75,10 @@ function getUserToken(ircbot, config, replyTo, sender, callback) {
 		return getAuthURL(config, sender, accountName, function(authorizationURL) {
 			ircbot.say(replyTo, 'You are not authorized - please follow the instructions in the private message');
 			ircbot.say(sender, 'Please authorize the bot to Fauna: ' + authorizationURL);
-
+			
+			if (config.fauna.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
+				ircbot.say(sender, 'After you receive the code, please enter it here, in the following format: !fauna auth <your code here>');
+			}
 		});
 	});
 }
@@ -92,6 +95,12 @@ function getAccessToken(ircbot, config, sender, accountName, code) {
 		const token = oauth2.accessToken.create(result);
 
 		setAccessToken(ircbot, sender, accountName, token);
+	});
+}
+
+function auth(ircbot, config, replyTo, sender, code) {
+	getAccountName(ircbot, replyTo, sender, function(accountName) {
+		getAccessToken(ircbot, config, sender, accountName, code);
 	});
 }
 
@@ -220,6 +229,12 @@ module.exports = {
 	execute: function(ircbot, config, utils, replyTo, sender, text) {
 		if (!oauth2) {
 			oauth2 = require('simple-oauth2').create(config.fauna.oauth2.credentials);
+		}
+		
+		const authPrefix = 'auth ';
+		if (text.indexOf(authPrefix) === 0) {
+			auth(ircbot, config, replyTo, sender, text.substr(authPrefix.length));
+			return;
 		}
 
 		switch (text) {
