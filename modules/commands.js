@@ -45,7 +45,7 @@ module.exports = function(ircbot, config, utils) {
 			return;
 		}
 
-		(constructors.shift())(config, utils, processConstructor);
+		(constructors.shift())(ircbot, config, utils, processConstructor);
 	}
 	
 	let constructors = [];

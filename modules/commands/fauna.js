@@ -2,13 +2,12 @@
 
 let oauth2;
 let authState = {};
-let httpServer;
 
 function setAccessToken(ircbot, sender, accountName, token) {
 	authState[accountName] = {
 		token: token
 	};
-	
+
 	ircbot.say(sender, 'Authentication successful!');
 }
 
@@ -18,33 +17,34 @@ function getAccountName(ircbot, replyTo, sender, callback) {
 			ircbot.say(replyTo, sender + ': This command only works over secure IRC connections');
 			return;
 		}
-		
+
 		if (!('account' in info)) {
 			ircbot.say(replyTo, sender + ': You are not logged in to IRC services. Please login and retry.');
 			return;
 		}
-		
+
 		callback(info.account);
 	});
 }
 
-function getAuthURL(config, accountName, callback) {
+function getAuthURL(config, sender, accountName, callback) {
 	const crypto = require('crypto');
 	let authParams = config.fauna.oauth2.authParams;
-	
+
 	crypto.randomBytes(32, (err, buf) => {
 		if (err) {
 			throw err;
 		}
-		
+
 		let state = buf.toString('hex');
-		
+
 		authState[accountName] = {
-			state: state
+			state: state,
+			currentNickname: sender
 		};
-		
+
 		authParams.state = state;
-		
+
 		callback(oauth2.authorizationCode.authorizeURL(authParams));
 	});
 }
@@ -54,46 +54,44 @@ function checkUserToken(ircbot, replyTo, sender, callbackFound, callbackNotFound
 		if (!(accountName in authState) || !('token' in authState[accountName])) {
 			return callbackNotFound(accountName);
 		}
-		
+
 		let token = authState[accountName].token;
-		
+
 		if (token.expired()) {
 			ircbot.say(sender, 'Your token has expired, trying to refresh...');
-			
+
 			return token.refresh((error, token) => {
 				setAccessToken(ircbot, sender, accountName, token);
 				callback(token, accountName);
 			});
 		}
-		
+
 		return callbackFound(token, accountName);
 	});
 }
 
 function getUserToken(ircbot, config, replyTo, sender, callback) {
 	checkUserToken(ircbot, replyTo, sender, callback, function(accountName) {
-		return getAuthURL(config, accountName, function(authorizationURL) {
+		return getAuthURL(config, sender, accountName, function(authorizationURL) {
 			ircbot.say(replyTo, 'You are not authorized - please follow the instructions in the private message');
 			ircbot.say(sender, 'Please authorize the bot to Fauna: ' + authorizationURL);
-			ircbot.say(sender, 'After you receive the code, please enter it here, in the following format: !fauna auth <your code here>');
+
 		});
 	});
 }
 
-function auth(ircbot, config, replyTo, sender, code) {
-	getAccountName(ircbot, replyTo, sender, function(accountName) {
-		oauth2.authorizationCode.getToken({
-			code: code,
-			redirect_uri: config.fauna.oauth2.authParams.redirect_uri
-		}, (error, result) => {
-			if (error) {
-				return ircbot.say(sender, 'Access Token Error: ' + error.message);
-			}
-			
-			const token = oauth2.accessToken.create(result);
-			
-			setAccessToken(ircbot, sender, accountName, token);
-		});
+function getAccessToken(ircbot, config, sender, accountName, code) {
+	oauth2.authorizationCode.getToken({
+		code: code,
+		redirect_uri: config.fauna.oauth2.authParams.redirect_uri
+	}, (error, result) => {
+		if (error) {
+			return ircbot.say(sender, 'Access Token Error: ' + error.message);
+		}
+
+		const token = oauth2.accessToken.create(result);
+
+		setAccessToken(ircbot, sender, accountName, token);
 	});
 }
 
@@ -104,13 +102,13 @@ function deauth(ircbot, replyTo, sender) {
 				ircbot.say(replyTo, 'Error revoking access token: ' + error.message);
 				return;
 			}
-			
+
 			token.revoke('refresh_token', (error) => {
 				if (error) {
 					ircbot.say(replyTo, 'Error revoking refresh token: ' + error.message);
 					return;
 				}
-				
+
 				delete authState[accountName];
 				ircbot.say(replyTo, 'Access tokens revoked successfully');
 			});
@@ -135,7 +133,7 @@ function executeCommand(ircbot, config, utils, replyTo, sender, cmd) {
 }
 
 function showHelp(ircbot, replyTo) {
-	ircbot.say(replyTo, 'Subcommands list: auth - enter auth code, deauth - revoke tokens, open/lock/unlock - control door, help - show this help, info - show your account info');
+	ircbot.say(replyTo, 'Subcommands list: open/lock/unlock - control door, deauth - revoke tokens, info - show your account info, help - show this help');
 }
 
 function showInfo(ircbot, config, utils, replyTo, sender) {
@@ -156,22 +154,66 @@ function showInvalidCommand(ircbot, replyTo) {
 module.exports = {
 	key: 'fauna',
 	description: 'interacts with init Lab\'s fauna',
-	init: function(config, utils, next) {
-		httpServer = new utils.httpServer.Server(config.fauna.http, function(error) {
+	init: function(ircbot, config, utils, next) {
+		new utils.httpServer.Server(config.fauna.http, function(error) {
 			if (error) {
 				console.log(error);
 			}
-			
+
 			next();
 		}, function(dispatcher) {
-			dispatcher.onGet('/', function(req, res) {
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
+			dispatcher.onGet('/oauth/fauna/callback', function(req, res) {
+				const URL = require('url');
+				const QS = require('querystring');
+
+				const url = URL.parse(req.url);
+				const query = QS.parse(url.query);
+				
+				if (!('code' in query) || !('state' in query)) {
+					res.writeHead(400, {
+						'Content-Type': 'text/plain'
+					});
+
+					res.end('Missing request parameters');
+					return;
+				}
+				
+				let accountName;
+				
+				Object.keys(authState).forEach(function(key) {
+					if (accountName) {
+						return;
+					}
+					
+					if (!('state' in authState[key])) {
+						return;
+					}
+
+					if (authState[key].state !== query.state) {
+						return;
+					}
+					
+					accountName = key;
+				});
+				
+				if (accountName) {
+					const userState = authState[accountName];
+					
+					getAccessToken(ircbot, config, userState.currentNickname, accountName, query.code);
+					
+					res.writeHead(200, {
+						'Content-Type': 'text/plain'
+					});
+
+					res.end('Authorization successful! You can close this page.');
+					return;
+				}
+
+				res.writeHead(400, {
+					'Content-Type': 'text/plain'
 				});
 
-				res.end(JSON.stringify({
-					status: 'OK'
-				}));
+				res.end('Authorization state not valid. Please retry.');
 			});
 		});
 	},
@@ -179,13 +221,7 @@ module.exports = {
 		if (!oauth2) {
 			oauth2 = require('simple-oauth2').create(config.fauna.oauth2.credentials);
 		}
-		
-		const authPrefix = 'auth ';
-		if (text.indexOf(authPrefix) === 0) {
-			auth(ircbot, config, replyTo, sender, text.substr(authPrefix.length));
-			return;
-		}
-		
+
 		switch (text) {
 			case 'deauth':
 				deauth(ircbot, replyTo, sender);
