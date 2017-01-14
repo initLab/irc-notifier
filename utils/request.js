@@ -9,7 +9,7 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 				throw error;
 			}
 			
-			if (response && response.statusCode < 400) {
+			if (response && response.statusCode >= 400) {
 				throw new Error('Error getting data, status code=' + response.statusCode);
 			}
 			
