@@ -38,3 +38,6 @@ jspm_packages
 
 # Application config
 /config.json
+
+# Fauna OAuth2 state
+/fauna_oauth2_state.json

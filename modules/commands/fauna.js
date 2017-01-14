@@ -1,12 +1,31 @@
 'use strict';
 
+const authStateFile = 'fauna_oauth2_state.json';
+
 let oauth2;
 let authState = {};
 
-function setAccessToken(ircbot, sender, accountName, token) {
+function saveAuthState(utils) {
+	let state = {};
+	
+	Object.keys(authState).forEach(function(key) {
+		if ('token' in authState[key]) {
+			state[key] = authState[key].token;
+		}
+		else {
+			state[key] = authState[key];
+		}
+	});
+	
+	utils.file.writeJson(authStateFile, state);
+}
+
+function setAccessToken(ircbot, utils, sender, accountName, token) {
 	authState[accountName] = {
 		token: token
 	};
+	
+	saveAuthState(utils);
 
 	ircbot.notice(sender, 'Authorization successful!');
 }
@@ -27,7 +46,7 @@ function getAccountName(ircbot, sender, callback) {
 	});
 }
 
-function getAuthURL(config, sender, accountName, callback) {
+function getAuthURL(config, utils, sender, accountName, callback) {
 	const crypto = require('crypto');
 	let authParams = config.fauna.oauth2.authParams;
 
@@ -42,6 +61,8 @@ function getAuthURL(config, sender, accountName, callback) {
 			state: state,
 			currentNickname: sender
 		};
+		
+		saveAuthState(utils);
 
 		authParams.state = state;
 
@@ -49,7 +70,7 @@ function getAuthURL(config, sender, accountName, callback) {
 	});
 }
 
-function checkUserToken(ircbot, sender, callbackFound, callbackNotFound) {
+function checkUserToken(ircbot, utils, sender, callbackFound, callbackNotFound) {
 	getAccountName(ircbot, sender, function(accountName) {
 		if (!(accountName in authState) || !('token' in authState[accountName])) {
 			return callbackNotFound(accountName);
@@ -61,7 +82,7 @@ function checkUserToken(ircbot, sender, callbackFound, callbackNotFound) {
 			ircbot.notice(sender, 'Your token has expired, trying to refresh...');
 
 			return token.refresh((error, token) => {
-				setAccessToken(ircbot, sender, accountName, token);
+				setAccessToken(ircbot, utils, sender, accountName, token);
 				callbackFound(token, accountName);
 			});
 		}
@@ -70,9 +91,9 @@ function checkUserToken(ircbot, sender, callbackFound, callbackNotFound) {
 	});
 }
 
-function getUserToken(ircbot, config, sender, callback) {
-	checkUserToken(ircbot, sender, callback, function(accountName) {
-		return getAuthURL(config, sender, accountName, function(authorizationURL) {
+function getUserToken(ircbot, config, utils, sender, callback) {
+	checkUserToken(ircbot, utils, sender, callback, function(accountName) {
+		return getAuthURL(config, utils, sender, accountName, function(authorizationURL) {
 			ircbot.notice(sender, 'To use this bot, please link your IRC account with Fauna here: ' + authorizationURL);
 			
 			if (config.fauna.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
@@ -82,7 +103,7 @@ function getUserToken(ircbot, config, sender, callback) {
 	});
 }
 
-function getAccessToken(ircbot, config, sender, accountName, code) {
+function getAccessToken(ircbot, config, utils, sender, accountName, code) {
 	oauth2.authorizationCode.getToken({
 		code: code,
 		redirect_uri: config.fauna.oauth2.authParams.redirect_uri
@@ -93,18 +114,18 @@ function getAccessToken(ircbot, config, sender, accountName, code) {
 
 		const token = oauth2.accessToken.create(result);
 
-		setAccessToken(ircbot, sender, accountName, token);
+		setAccessToken(ircbot, utils, sender, accountName, token);
 	});
 }
 
-function auth(ircbot, config, sender, code) {
+function auth(ircbot, config, utils, sender, code) {
 	getAccountName(ircbot, sender, function(accountName) {
-		getAccessToken(ircbot, config, sender, accountName, code);
+		getAccessToken(ircbot, config, utils, sender, accountName, code);
 	});
 }
 
-function deauth(ircbot, sender) {
-	checkUserToken(ircbot, sender, function(token, accountName) {
+function deauth(ircbot, utils, sender) {
+	checkUserToken(ircbot, utils, sender, function(token, accountName) {
 		token.revoke('access_token', (error) => {
 			if (error) {
 				ircbot.notice(sender, 'Error revoking access token: ' + error.message);
@@ -118,6 +139,8 @@ function deauth(ircbot, sender) {
 				}
 
 				delete authState[accountName];
+				saveAuthState(utils);
+				
 				ircbot.notice(sender, 'Access tokens revoked successfully');
 			});
 		});
@@ -127,7 +150,7 @@ function deauth(ircbot, sender) {
 }
 
 function executeCommand(ircbot, config, utils, sender, cmd) {
-	getUserToken(ircbot, config, sender, function(token, accountName) {
+	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
 		utils.request.postOAuth2(config.fauna.urls.actions.door, {
 			door_action: {
 				name: cmd
@@ -145,7 +168,7 @@ function showHelp(ircbot, replyTo) {
 }
 
 function showInfo(ircbot, config, utils, sender) {
-	getUserToken(ircbot, config, sender, function(token, accountName) {
+	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
 		utils.request.getJsonOAuth2(config.fauna.urls.resourceOwner, token.token.access_token, function(data) {
 			ircbot.notice(sender, 'You are logged in to IRC as ' + accountName + ' and have linked the following Fauna account:');
 			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + (data.roles.join(', ') || '<none>'));
@@ -163,6 +186,26 @@ module.exports = {
 	key: 'fauna',
 	description: 'interacts with init Lab\'s fauna',
 	init: function(ircbot, config, utils, next) {
+		oauth2 = require('simple-oauth2').create(config.fauna.oauth2.credentials);
+		
+		try {
+			let state = utils.file.readJson(authStateFile);
+
+			Object.keys(state).forEach(function(key) {
+				if ('token' in state[key]) {
+					authState[key] = {
+						token: oauth2.accessToken.create(state[key].token)
+					};
+				}
+				else {
+					authState[key] = state[key];
+				}
+			});
+		}
+		catch (e) {
+			console.log(e);
+		}
+		
 		new utils.httpServer.Server(config.fauna.http, function(error) {
 			if (error) {
 				console.log(error);
@@ -207,7 +250,7 @@ module.exports = {
 				if (accountName) {
 					const userState = authState[accountName];
 					
-					getAccessToken(ircbot, config, userState.currentNickname, accountName, query.code);
+					getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
 					
 					res.writeHead(200, {
 						'Content-Type': 'text/plain'
@@ -226,19 +269,15 @@ module.exports = {
 		});
 	},
 	execute: function(ircbot, config, utils, replyTo, sender, text) {
-		if (!oauth2) {
-			oauth2 = require('simple-oauth2').create(config.fauna.oauth2.credentials);
-		}
-		
 		const authPrefix = 'auth ';
 		if (text.indexOf(authPrefix) === 0) {
-			auth(ircbot, config, sender, text.substr(authPrefix.length));
+			auth(ircbot, config, utils, sender, text.substr(authPrefix.length));
 			return;
 		}
 
 		switch (text) {
 			case 'deauth':
-				deauth(ircbot, sender);
+				deauth(ircbot, utils, sender);
 				break;
 			case 'open':
 			case 'lock':
