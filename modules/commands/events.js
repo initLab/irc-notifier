@@ -14,8 +14,7 @@ function shortenEventUrl(event, callback, utils) {
 function isToday(datetime) {
 	const dt = new Date;
 
-	return
-		dt.getDate() === datetime.getDate() &&
+	return dt.getDate() === datetime.getDate() &&
 		dt.getMonth() === datetime.getMonth() &&
 		dt.getYear() === datetime.getYear();
 }
@@ -30,7 +29,7 @@ function leadingZero(num) {
 
 function formatDate(datetime) {
 	return leadingZero(datetime.getDate()) + '.' +
-		leadingZero(datetime.getMonth() + 1) + '.' +
+			leadingZero(datetime.getMonth() + 1) + '.' +
 		datetime.getFullYear() + ' ' +
 		leadingZero(datetime.getHours()) + ':' +
 		leadingZero(datetime.getMinutes());
