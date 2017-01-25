@@ -28,9 +28,12 @@ function leadingZero(num) {
 }
 
 function formatDate(datetime) {
-	return leadingZero(datetime.getDate()) + '.' +
+	return (isToday(datetime) ? '' :
+		(
+			leadingZero(datetime.getDate()) + '.' +
 			leadingZero(datetime.getMonth() + 1) + '.' +
-		datetime.getFullYear() + ' ' +
+			datetime.getFullYear() + ' '
+		)) +
 		leadingZero(datetime.getHours()) + ':' +
 		leadingZero(datetime.getMinutes());
 }
