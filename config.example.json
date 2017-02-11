@@ -17,7 +17,6 @@
 			"showErrors": true,
 			"userName": "ircbot"
 		},
-		"announceChannel": "#example",
 		"account": {
 			"username": "notifier",
 			"password": "example"

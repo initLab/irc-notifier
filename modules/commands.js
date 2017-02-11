@@ -29,8 +29,8 @@ module.exports = function(ircbot, config, utils) {
 	}
 	
 	function bindEvents() {
-		ircbot.addListener('message' + config.irc.announceChannel, function(sender, text) {
-			executeCommand(sender, config.irc.announceChannel, text);
+		ircbot.addListener('message#', function(sender, to, text) {
+			executeCommand(sender, to, text);
 		});
 		
 		ircbot.addListener('pm', function(sender, text) {

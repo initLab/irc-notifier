@@ -71,9 +71,6 @@ module.exports = function(ircbot, config, utils) {
 				sendCmd = false;
 				
 				switch (cmd) {
-					case 'test':
-						ircbot.say(config.irc.announceChannel, 'test');
-					break;
 					case 'exit':
 						if (ircbot.conn) {
 							ircbot.disconnect('Exiting by control socket request', function() {
