@@ -1,9 +1,7 @@
 'use strict';
 
-module.exports = {
-	key: 'who',
-	description: 'shows present users',
-	execute: function(ircbot, config, utils, replyTo, sender, text) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo, sender, text) {
 		if (text.toLowerCase() === 'let the dogs out') {
 			ircbot.say(replyTo, 'Who? Who? Who? Who? https://youtu.be/Qkuu0Lwb5EM');
 			return;
@@ -48,4 +46,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'who',
+		description: 'shows present users',
+		execute: execute
+	};
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(ircbot, config, utils) {
+module.exports = function(config, ircbot, utils) {
 	const logger = utils.logger.log;
 	
 	function commandCallback(line) {
@@ -105,10 +105,10 @@ module.exports = function(ircbot, config, utils) {
 		}
 	}
 	
-	if (!('socket' in config) || !('path' in config.socket)) {
+	if (!('path' in config)) {
 		logger('Starting without control socket');
 		return;
 	}
 	
-	const controlSocket = new utils.commandSocket.Socket(config.socket.path, commandCallback);
+	const controlSocket = new utils.commandSocket.Socket(config.path, commandCallback);
 };

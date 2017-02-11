@@ -38,10 +38,8 @@ function formatDate(datetime) {
 		leadingZero(datetime.getMinutes());
 }
 
-module.exports = {
-	key: 'events',
-	description: 'shows events at init Lab',
-	execute: function(ircbot, config, utils, replyTo) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo) {
 		utils.request.getXml('https://initlab.org/events/feed/', function(data) {
 			const async = require('async');
 			
@@ -96,4 +94,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'events',
+		description: 'shows events at init Lab',
+		execute: execute
+	};
 };

@@ -47,10 +47,8 @@ function formatDayLength(seconds) {
 	return day_length.join(' ');
 }
 
-module.exports = {
-	key: 'sun',
-	description: 'shows sunrise/sunset time',
-	execute: function(ircbot, config, utils, replyTo) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo) {
 		utils.request.getJson('http://api.sunrise-sunset.org/json?lat=42.70789247&lng=23.32527086&formatted=0', function(data) {
 			if (data.status !== 'OK') {
 				ircbot.say('Error in response');
@@ -89,4 +87,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'sun',
+		description: 'shows sunrise/sunset time',
+		execute: execute
+	};
 };

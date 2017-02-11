@@ -1,9 +1,7 @@
 'use strict';
 
-module.exports = {
-	key: 'music',
-	description: 'shows current music track',
-	execute: function(ircbot, config, utils, replyTo) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo) {
 		utils.request.getJson('http://spitfire.initlab.org:8989/status', function(data) {
 			if (data.error) {
 				ircbot.say('Error reading music status: ' + data.error);
@@ -31,4 +29,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'music',
+		description: 'shows current music track',
+		execute: execute
+	};
 };

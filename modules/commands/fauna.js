@@ -48,7 +48,7 @@ function getAccountName(ircbot, sender, callback) {
 
 function getAuthURL(config, utils, sender, accountName, callback) {
 	const crypto = require('crypto');
-	let authParams = config.fauna.oauth2.authParams;
+	let authParams = config.oauth2.authParams;
 
 	crypto.randomBytes(32, (err, buf) => {
 		if (err) {
@@ -96,7 +96,7 @@ function getUserToken(ircbot, config, utils, sender, callback) {
 		return getAuthURL(config, utils, sender, accountName, function(authorizationURL) {
 			ircbot.notice(sender, 'To use this bot, please link your IRC account with Fauna here: ' + authorizationURL);
 			
-			if (config.fauna.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
+			if (config.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
 				ircbot.notice(sender, 'After you receive the code, please enter it using the following command: /msg ' + ircbot.nick + ' !fauna auth <your code here>');
 			}
 		});
@@ -106,7 +106,7 @@ function getUserToken(ircbot, config, utils, sender, callback) {
 function getAccessToken(ircbot, config, utils, sender, accountName, code) {
 	oauth2.authorizationCode.getToken({
 		code: code,
-		redirect_uri: config.fauna.oauth2.authParams.redirect_uri
+		redirect_uri: config.oauth2.authParams.redirect_uri
 	}, (error, result) => {
 		if (error) {
 			return ircbot.notice(sender, 'Access Token Error: ' + error.message);
@@ -151,7 +151,7 @@ function deauth(ircbot, utils, sender) {
 
 function executeCommand(ircbot, config, utils, sender, cmd) {
 	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
-		utils.request.postOAuth2(config.fauna.urls.actions.door, {
+		utils.request.postOAuth2(config.urls.actions.door, {
 			door_action: {
 				name: cmd
 			}
@@ -169,7 +169,7 @@ function showHelp(ircbot, replyTo) {
 
 function showInfo(ircbot, config, utils, sender) {
 	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
-		utils.request.getJsonOAuth2(config.fauna.urls.resourceOwner, token.token.access_token, function(data) {
+		utils.request.getJsonOAuth2(config.urls.resourceOwner, token.token.access_token, function(data) {
 			ircbot.notice(sender, 'You are logged in to IRC as ' + accountName + ' and have linked the following Fauna account:');
 			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + (data.roles.join(', ') || '<none>'));
 		}, function(error) {
@@ -182,93 +182,88 @@ function showInvalidCommand(ircbot, replyTo) {
 	ircbot.say(replyTo, 'Invalid subcommand, try !fauna help');
 }
 
-module.exports = {
-	key: 'fauna',
-	description: 'interacts with init Lab\'s fauna',
-	init: function(ircbot, config, utils, next) {
-		oauth2 = require('simple-oauth2').create(config.fauna.oauth2.credentials);
-		
-		try {
-			let state = utils.file.readJson(authStateFile);
+module.exports = function(config, ircbot, utils) {
+	oauth2 = require('simple-oauth2').create(config.oauth2.credentials);
+	
+	try {
+		let state = utils.file.readJson(authStateFile);
 
-			Object.keys(state).forEach(function(key) {
-				if ('token' in state[key]) {
-					authState[key] = {
-						token: oauth2.accessToken.create(state[key].token)
-					};
-				}
-				else {
-					authState[key] = state[key];
-				}
-			});
-		}
-		catch (e) {
-			console.log(e);
-		}
-		
-		new utils.httpServer.Server(config.fauna.http, function(error) {
-			if (error) {
-				console.log(error);
+		Object.keys(state).forEach(function(key) {
+			if ('token' in state[key]) {
+				authState[key] = {
+					token: oauth2.accessToken.create(state[key].token)
+				};
 			}
+			else {
+				authState[key] = state[key];
+			}
+		});
+	}
+	catch (e) {
+		console.log(e);
+	}
+	
+	new utils.httpServer.Server(config.http, function(error) {
+		if (error) {
+			console.log(error);
+		}
+	}, function(dispatcher) {
+		dispatcher.onGet('/oauth/fauna/callback', function(req, res) {
+			const URL = require('url');
+			const QS = require('querystring');
 
-			next();
-		}, function(dispatcher) {
-			dispatcher.onGet('/oauth/fauna/callback', function(req, res) {
-				const URL = require('url');
-				const QS = require('querystring');
-
-				const url = URL.parse(req.url);
-				const query = QS.parse(url.query);
-				
-				if (!('code' in query) || !('state' in query)) {
-					res.writeHead(400, {
-						'Content-Type': 'text/plain'
-					});
-
-					res.end('Missing request parameters');
-					return;
-				}
-				
-				let accountName;
-				
-				Object.keys(authState).forEach(function(key) {
-					if (accountName) {
-						return;
-					}
-					
-					if (!('state' in authState[key])) {
-						return;
-					}
-
-					if (authState[key].state !== query.state) {
-						return;
-					}
-					
-					accountName = key;
-				});
-				
-				if (accountName) {
-					const userState = authState[accountName];
-					
-					getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
-					
-					res.writeHead(200, {
-						'Content-Type': 'text/plain'
-					});
-
-					res.end('Authorization successful! You can close this page.');
-					return;
-				}
-
+			const url = URL.parse(req.url);
+			const query = QS.parse(url.query);
+			
+			if (!('code' in query) || !('state' in query)) {
 				res.writeHead(400, {
 					'Content-Type': 'text/plain'
 				});
 
-				res.end('Authorization state not valid. Please retry.');
+				res.end('Missing request parameters');
+				return;
+			}
+			
+			let accountName;
+			
+			Object.keys(authState).forEach(function(key) {
+				if (accountName) {
+					return;
+				}
+				
+				if (!('state' in authState[key])) {
+					return;
+				}
+
+				if (authState[key].state !== query.state) {
+					return;
+				}
+				
+				accountName = key;
 			});
+			
+			if (accountName) {
+				const userState = authState[accountName];
+				
+				getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
+				
+				res.writeHead(200, {
+					'Content-Type': 'text/plain'
+				});
+
+				res.end('Authorization successful! You can close this page.');
+				return;
+			}
+
+			res.writeHead(400, {
+				'Content-Type': 'text/plain'
+			});
+
+			res.end('Authorization state not valid. Please retry.');
 		});
-	},
-	execute: function(ircbot, config, utils, replyTo, sender, text) {
+	});
+	
+	function execute(replyTo, sender, text) {
 		const authPrefix = 'auth ';
 		if (text.indexOf(authPrefix) === 0) {
 			auth(ircbot, config, utils, sender, text.substr(authPrefix.length));
@@ -296,4 +291,10 @@ module.exports = {
 				break;
 		}
 	}
+	
+	return {
+		key: 'fauna',
+		description: 'interacts with init Lab\'s fauna',
+		execute: execute
+	};
 };

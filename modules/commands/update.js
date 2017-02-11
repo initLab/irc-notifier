@@ -1,9 +1,7 @@
 'use strict';
 
-module.exports = {
-	key: 'update',
-	description: 'updates the bot',
-	execute: function(ircbot, config, utils, replyTo, sender) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo, sender) {
 		const child_process = require('child_process');
 
 		let needsUpdate = true;
@@ -58,4 +56,10 @@ module.exports = {
 			ircbot.say(replyTo, `Failed to update: ${err}`);
 		});
 	}
+	
+	return {
+		key: 'update',
+		description: 'updates the bot',
+		execute: execute
+	};
 };

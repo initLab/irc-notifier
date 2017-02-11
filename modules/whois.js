@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(ircbot, config) {
+module.exports = function(config, ircbot) {
 	ircbot.addListener('raw', function(message) {
 		switch (message.command) {
 			case 'rpl_whoisidle':

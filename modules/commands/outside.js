@@ -1,9 +1,7 @@
 'use strict';
 
-module.exports = {
-	key: 'outside',
-	description: 'shows outside weather',
-	execute: function(ircbot, config, utils, replyTo) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo) {
 		utils.request.getJson('https://api.thingspeak.com/channels/132452/feeds.json?days=1&results=1', function(data) {
 			if (data.feeds.length === 0) {
 				ircbot.say(replyTo, 'Error: no data');
@@ -19,4 +17,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'outside',
+		description: 'shows outside weather',
+		execute: execute
+	};
 };

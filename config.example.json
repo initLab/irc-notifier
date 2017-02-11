@@ -1,7 +1,4 @@
 {
-	"socket": {
-		"path": "/tmp/ircbot.sock"
-	},
 	"irc": {
 		"server": "irc.example.com",
 		"nickname": "notifier",
@@ -16,46 +13,71 @@
 			"secure": true,
 			"showErrors": true,
 			"userName": "ircbot"
+		}
+	},
+	"modules": {
+		"commands": {
+			"commands": {
+				"door": true,
+				"events": true,
+				"fauna": {
+					"http": {
+						"listen": {
+							"host": "::",
+							"port": 1234
+						}
+					},
+					"oauth2": {
+						"credentials": {
+							"client": {
+								"id": "xxxx",
+								"secret": "xxxx"
+							},
+							"auth": {
+								"tokenHost": "https://example.com"
+							},
+							"options": {
+								"useBasicAuthorizationHeader": false,
+								"useBodyAuth": true
+							}
+						},
+						"authParams": {
+							"redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+							"scope": "public door_control door_latch_control"
+						}
+					},
+					"urls": {
+						"resourceOwner": "https://example.com/user",
+						"actions": {
+							"door": "https://example.com/door/actions"
+						}
+					}
+				},
+				"help": true,
+				"lights": true,
+				"music": true,
+				"outside": true,
+				"sun": {
+					"lat": 42.70789247,
+					"lng": 23.32527086
+				},
+				"update": {
+					"startupScript": "/home/user/irc-notifier/start.sh"
+				},
+				"weather": true,
+				"who": true,
+				"whois": true
+			}
 		},
-		"account": {
+		"console": true,
+		"controlSocket": {
+			"path": "/tmp/ircbot.sock"
+		},
+		"login": {
 			"username": "notifier",
 			"password": "example"
-		}
-	},
-	"process": {
-		"startupScript": "/home/user/ircBot/start.sh"
-	},
-	"fauna": {
-		"http": {
-			"listen": {
-				"host": "::",
-				"port": 1234
-			}
 		},
-		"oauth2": {
-			"credentials": {
-				"client": {
-					"id": "xxxx",
-					"secret": "xxxx"
-				},
-				"auth": {
-					"tokenHost": "https://example.com"
-				},
-				"options": {
-					"useBasicAuthorizationHeader": false,
-					"useBodyAuth": true
-				}
-			},
-			"authParams": {
-				"redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
-				"scope": "public"
-			}
-		},
-		"urls": {
-			"resourceOwner": "https://example.com/user",
-			"actions": {
-				"door": "https://example.com/door/actions"
-			}
-		}
+		"slap": true,
+		"whois": true
 	}
 }

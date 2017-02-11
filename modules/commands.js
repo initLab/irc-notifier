@@ -1,9 +1,10 @@
 'use strict';
 
-module.exports = function(ircbot, config, utils) {
-	const requireDir = require('require-dir');
-	const commands = requireDir('commands');
-	
+module.exports = function(config, ircbot, utils) {
+	let args = Array.prototype.slice.call(arguments, 1);
+	args.unshift('modules/commands', config.commands);
+	const commands = utils.moduleLoader.apply(utils, args);
+
 	function executeCommand(sender, replyTo, text) {
 		Object.keys(commands).forEach(function(key) {
 			const command = commands[key];
@@ -20,7 +21,7 @@ module.exports = function(ircbot, config, utils) {
 			}
 			
 			try {
-				command.execute(ircbot, config, utils, replyTo, sender, text.substr(commandPrefix.length + 1), commands);
+				command.execute(replyTo, sender, text.substr(commandPrefix.length + 1), commands);
 			}
 			catch (e) {
 				ircbot.say(replyTo, 'Error executing command "' + command.key + '": ' + e.message);
@@ -28,39 +29,11 @@ module.exports = function(ircbot, config, utils) {
 		});
 	}
 	
-	function bindEvents() {
-		ircbot.addListener('message#', function(sender, to, text) {
-			executeCommand(sender, to, text);
-		});
-		
-		ircbot.addListener('pm', function(sender, text) {
-			executeCommand(sender, sender, text);
-		});
-	}
-	
-	function processConstructor() {
-		if (constructors.length === 0) {
-			console.log('Commands initialised');
-			bindEvents();
-			return;
-		}
-
-		(constructors.shift())(ircbot, config, utils, processConstructor);
-	}
-	
-	let constructors = [];
-	
-	Object.keys(commands).forEach(function(key) {
-		const command = commands[key];
-		
-		if (!('init' in command)) {
-			return;
-		}
-		
-		constructors.push(command.init);
+	ircbot.addListener('message#', function(sender, to, text) {
+		executeCommand(sender, to, text);
 	});
 	
-	console.log('Initialising commands...');
-	
-	processConstructor();
+	ircbot.addListener('pm', function(sender, text) {
+		executeCommand(sender, sender, text);
+	});
 };

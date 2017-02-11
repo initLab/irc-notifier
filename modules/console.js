@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(ircbot, config, utils) {
+module.exports = function(config, ircbot, utils) {
 	const logger = utils.logger.log;
 	
 	// Whois

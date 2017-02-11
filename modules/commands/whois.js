@@ -1,9 +1,7 @@
 'use strict';
 
-module.exports = {
-	key: 'whois',
-	description: 'lookups IP address',
-	execute: function(ircbot, config, utils, replyTo, sender, text) {
+module.exports = function(config, ircbot, utils) {
+	function execute(replyTo, sender, text) {
 		utils.request.getJson('http://ip-api.com/json/' + encodeURIComponent(text), function(data) {
 			if (data.status === 'fail') {
 				ircbot.say(replyTo, 'Error looking up "' + data.query + '": ' + data.message);
@@ -17,4 +15,10 @@ module.exports = {
 			ircbot.say(replyTo, error);
 		});
 	}
+	
+	return {
+		key: 'whois',
+		description: 'lookups IP address',
+		execute: execute
+	};
 };
