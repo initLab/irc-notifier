@@ -49,7 +49,7 @@ function formatDayLength(seconds) {
 
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo) {
-		utils.request.getJson('http://api.sunrise-sunset.org/json?lat=42.70789247&lng=23.32527086&formatted=0', function(data) {
+		utils.request.getJson('http://api.sunrise-sunset.org/json?lat=' + config.lat + '&lng=' + config.lng + '&formatted=0', function(data) {
 			if (data.status !== 'OK') {
 				ircbot.say('Error in response');
 				return;
