@@ -1,9 +1,9 @@
 'use strict';
 
-const net = require('net');
-const fs = require('fs');
-
 function Socket(path, cmdCallback) {
+	const net = require('net');
+	const fs = require('fs');
+	
     const server = net.createServer();
 	let invokedSuccess = false;
 	

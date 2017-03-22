@@ -1,9 +1,9 @@
 'use strict';
 
-var Path = require('path');
-var rootDir = Path.dirname(require.main.filename);
-
 module.exports = function(dir, modulesConfig) {
+	var Path = require('path');
+	var rootDir = Path.dirname(require.main.filename);
+
 	let result = {};
 	
 	for (let moduleName in modulesConfig) {
