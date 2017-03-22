@@ -18,6 +18,10 @@
 	"modules": {
 		"commands": {
 			"commands": {
+				"cs": {
+					"host": "example.com",
+					"port": 27015
+				},
 				"door": true,
 				"env": {
 					"channels": {
@@ -60,6 +64,10 @@
 					}
 				},
 				"help": true,
+				"hl": {
+					"host": "example.com",
+					"port": 27015
+				},
 				"lights": true,
 				"music": true,
 				"sun": {
