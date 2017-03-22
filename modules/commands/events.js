@@ -78,16 +78,22 @@ module.exports = function(config, ircbot, utils) {
 			
 			// send to IRC
 			async.map(selectedEvents, (event, callback) => shortenEventUrl(event, callback, utils), function(err, results) {
-				if (err !== null) {
-					ircbot.say(replyTo, err);
-					return false;
-				}
-				
-				for (let i = 0; i < results.length; ++i) {
-					const event = results[i];
+				try {
+					if (err !== null) {
+						throw err;
+					}
 					
-					ircbot.say(replyTo, '[' + formatDate(event.datetime) + '] ' +
-						event.title + ' ' + (event.shortUrl));
+					for (let i = 0; i < results.length; ++i) {
+						const event = results[i];
+						
+						ircbot.say(replyTo, '[' + formatDate(event.datetime) + '] ' +
+							event.title + ' ' + event.shortUrl);
+					}
+				}
+				catch (e) {
+					console.error(e.stack);
+					ircbot.say(replyTo, e);
+					return false;
 				}
 			});
 		}, function (error) {

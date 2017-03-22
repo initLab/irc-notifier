@@ -28,7 +28,8 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 			onSuccess.call(response, body);
 		}
 		catch (e) {
-			onError.call(response, e.message);
+			console.error(e.stack);
+			onError.call(response, e);
 		}
 	});
 }
