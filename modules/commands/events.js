@@ -11,33 +11,6 @@ function shortenEventUrl(event, callback, utils) {
 	});
 }
 
-function isToday(datetime) {
-	const dt = new Date;
-
-	return dt.getDate() === datetime.getDate() &&
-		dt.getMonth() === datetime.getMonth() &&
-		dt.getYear() === datetime.getYear();
-}
-
-function leadingZero(num) {
-	if (num > 9) {
-		return num;
-	}
-	
-	return '0' + num;
-}
-
-function formatDate(datetime) {
-	return (isToday(datetime) ? '' :
-		(
-			leadingZero(datetime.getDate()) + '.' +
-			leadingZero(datetime.getMonth() + 1) + '.' +
-			datetime.getFullYear() + ' '
-		)) +
-		leadingZero(datetime.getHours()) + ':' +
-		leadingZero(datetime.getMinutes());
-}
-
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo) {
 		utils.request.getXml('https://initlab.org/events/feed/', function(data) {
@@ -65,7 +38,7 @@ module.exports = function(config, ircbot, utils) {
 			
 			for (let i = 0; i < sortedEvents.length; ++i) {
 				const event = sortedEvents[i];
-				const today = isToday(event.datetime);
+				const today = utils.time.isToday(event.datetime);
 				
 				// if there are events today, show all of them
 				// if not, show the next one
@@ -86,7 +59,7 @@ module.exports = function(config, ircbot, utils) {
 					for (let i = 0; i < results.length; ++i) {
 						const event = results[i];
 						
-						ircbot.say(replyTo, '[' + formatDate(event.datetime) + '] ' +
+						ircbot.say(replyTo, '[' + utils.time.formatDateTimeShort(event.datetime) + '] ' +
 							event.title + ' ' + event.shortUrl);
 					}
 				}

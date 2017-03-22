@@ -24,7 +24,7 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 					onSuccess.call(response, result);
 				});
 			}
-		
+			
 			onSuccess.call(response, body);
 		}
 		catch (e) {
