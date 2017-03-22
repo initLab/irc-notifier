@@ -47,7 +47,7 @@ function formatPlayers(data) {
 	checkError(data);
 	
 	return data.result.sort(function(a, b) {
-		return a.Score > b.Score;
+		return a.Score < b.Score;
 	}).map(function(player) {
 		return [
 			player.Name + ': ' + player.Score + ' frags',
