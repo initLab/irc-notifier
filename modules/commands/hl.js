@@ -2,7 +2,7 @@
 
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo, sender, text) {
-		utils.gameStatus.sendGameStatus(config, ircbot, utils, replyTo);
+		utils.hldsStatus.sendGameStatus(config, ircbot, utils, replyTo);
 	}
 	
 	return {
