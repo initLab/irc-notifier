@@ -69,6 +69,10 @@
 					"port": 27015
 				},
 				"lights": true,
+				"mc": {
+					"host": "example.com",
+					"port": 25565
+				},
 				"music": true,
 				"sun": {
 					"lat": 42.70789247,
