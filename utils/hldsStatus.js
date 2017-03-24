@@ -57,7 +57,7 @@ function formatPlayers(data) {
 }
 
 function sendGameStatus(config, ircbot, utils, replyTo) {
-	utils.request.getJson('https://dev.6bez10.info/hlds/?hostname=' +
+	utils.request.getJson('https://dev.6bez10.info/hlds/?host=' +
 		encodeURIComponent(config.host) +
 		'&port=' +
 		encodeURIComponent(config.port) +
@@ -66,7 +66,7 @@ function sendGameStatus(config, ircbot, utils, replyTo) {
 		ircbot.say(replyTo, config.host + ':' + config.port + ' | ' + formatInfo(data));
 
 		if (data.result.Players > 0) {
-			utils.request.getJson('https://dev.6bez10.info/hlds/?hostname=' +
+			utils.request.getJson('https://dev.6bez10.info/hlds/?host=' +
 				encodeURIComponent(config.host) +
 				'&port=' +
 				encodeURIComponent(config.port) +
