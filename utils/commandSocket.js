@@ -1,11 +1,12 @@
 'use strict';
 
-function Socket(path, cmdCallback) {
+function Socket(options, cmdCallback) {
 	const net = require('net');
-	const fs = require('fs');
-	
     const server = net.createServer();
-	let invokedSuccess = false;
+		
+	if ('path' in options) {
+		const fs = require('fs');
+	}
 	
     server.on('connection', function(connection) {
         console.info('CONTROL: Socket open');
@@ -36,15 +37,23 @@ function Socket(path, cmdCallback) {
     
     server.on('listening', function() {
         console.info('CONTROL: Socket bound');
-
-        fs.chmod(path, parseInt('775', 8));
+		
+		
+		if ('path' in options) {
+			fs.chmod(options.path, parseInt('775', 8));
+		}
     });
 
     server.on('error', function (e) {
         switch (e.code) {
             case 'EADDRINUSE':
-                console.warn('CONTROL: Socket in use, retrying...');
-                fs.unlink(path, bindSocket);
+				if ('path' in options) {
+					console.warn('CONTROL: Socket in use, retrying...');
+					fs.unlink(options.path, bindSocket);
+				}	
+				else {
+					console.warn('CONTROL: Socket in use!');
+				}
             break;
             case 'EACCES':
 				console.warn('CONTROL: Access denied');
@@ -59,7 +68,7 @@ function Socket(path, cmdCallback) {
 
     function bindSocket() {
         console.info('CONTROL: Attempting to bind socket...');
-        server.listen(path);
+        server.listen(options);
     }
 
     bindSocket();

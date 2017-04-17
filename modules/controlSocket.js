@@ -3,6 +3,11 @@
 module.exports = function(config, ircbot, utils) {
 	const logger = utils.logger.log;
 	
+	if (!('path' in config) && !('port' in config)) {
+		logger('Starting without control socket, because neither path nor port were provided');
+		return;
+	}
+	
 	function commandCallback(line) {
 		let args = line.split(' ');
 		let cmd = args.shift().toLowerCase();
@@ -105,10 +110,5 @@ module.exports = function(config, ircbot, utils) {
 		}
 	}
 	
-	if (!('path' in config)) {
-		logger('Starting without control socket');
-		return;
-	}
-	
-	const controlSocket = new utils.commandSocket.Socket(config.path, commandCallback);
+	const controlSocket = new utils.commandSocket.Socket(config, commandCallback);
 };
