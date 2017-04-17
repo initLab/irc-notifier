@@ -93,6 +93,14 @@
 			"username": "notifier",
 			"password": "example"
 		},
+		"minecraftRelay": {
+			"channel": "#example",
+			"rcon": {
+				"host": "example.com",
+				"port": 25575,
+				"password": "secret"
+			}
+		},
 		"slap": true,
 		"whois": true
 	}
