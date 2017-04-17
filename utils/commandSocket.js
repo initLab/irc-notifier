@@ -2,11 +2,9 @@
 
 function Socket(options, cmdCallback) {
 	const net = require('net');
+	const fs = require('fs');
+
     const server = net.createServer();
-		
-	if ('path' in options) {
-		const fs = require('fs');
-	}
 	
     server.on('connection', function(connection) {
         console.info('CONTROL: Socket open');
