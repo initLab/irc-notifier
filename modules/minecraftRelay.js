@@ -20,10 +20,10 @@ module.exports = function(config, ircbot) {
 			return;
 		}
 		
-		client.send('say IRC> * ' + from + ' ' + text);
+		client.send('say * ' + from + ' ' + text);
 	});
 	
 	ircbot.addListener('message' + config.channel, function(from, text) {
-		client.send('say IRC> <' + from + '> ' + text);
+		client.send('say <' + from + '> ' + text);
 	});
 };
