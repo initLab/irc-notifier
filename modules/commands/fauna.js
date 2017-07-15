@@ -82,6 +82,10 @@ function checkUserToken(ircbot, utils, sender, callbackFound, callbackNotFound) 
 			ircbot.notice(sender, 'Your token has expired, trying to refresh...');
 
 			return token.refresh((error, token) => {
+				if (error) {
+					return ircbot.notice(sender, 'Error while refreshing the token: ' + error.message + ' (code ' + error.code + ')');
+				}
+				
 				setAccessToken(ircbot, utils, sender, accountName, token);
 				callbackFound(token, accountName);
 			});
