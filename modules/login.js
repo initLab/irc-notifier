@@ -1,7 +1,10 @@
 'use strict';
 
 module.exports = function(config, ircbot) {
-	if (!('username' in config) || !('password' in config)) {
+	if (
+		!('username' in config) || !config.username ||
+		!('password' in config) || !config.password
+	) {
 		return;
 	}
 	
