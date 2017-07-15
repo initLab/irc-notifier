@@ -202,65 +202,53 @@ module.exports = function(config, ircbot, utils) {
 	catch (e) {
 		console.log(e);
 	}
-	
-	new utils.httpServer.Server(config.http, function(error) {
-		if (error) {
-			console.log(error);
-		}
-	}, function(dispatcher) {
-		dispatcher.onGet('/oauth/fauna/callback', function(req, res) {
-			const URL = require('url');
-			const QS = require('querystring');
 
-			const url = URL.parse(req.url);
-			const query = QS.parse(url.query);
-			
-			if (!('code' in query) || !('state' in query)) {
-				res.writeHead(400, {
-					'Content-Type': 'text/plain'
-				});
-
-				res.end('Missing request parameters');
-				return;
-			}
-			
-			let accountName;
-			
-			Object.keys(authState).forEach(function(key) {
-				if (accountName) {
-					return;
-				}
-				
-				if (!('state' in authState[key])) {
-					return;
-				}
-
-				if (authState[key].state !== query.state) {
-					return;
-				}
-				
-				accountName = key;
-			});
-			
-			if (accountName) {
-				const userState = authState[accountName];
-				
-				getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
-				
-				res.writeHead(200, {
-					'Content-Type': 'text/plain'
-				});
-
-				res.end('Authorization successful! You can close this page.');
-				return;
-			}
-
+	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', function(req, res, url, query) {
+		if (!('code' in query) || !('state' in query)) {
 			res.writeHead(400, {
 				'Content-Type': 'text/plain'
 			});
 
-			res.end('Authorization state not valid. Please retry.');
+			res.end('Missing request parameters');
+			return;
+		}
+		
+		let accountName;
+		
+		Object.keys(authState).forEach(function(key) {
+			if (accountName) {
+				return;
+			}
+			
+			if (!('state' in authState[key])) {
+				return;
+			}
+
+			if (authState[key].state !== query.state) {
+				return;
+			}
+			
+			accountName = key;
 		});
+		
+		if (accountName) {
+			const userState = authState[accountName];
+			
+			getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
+			
+			res.writeHead(200, {
+				'Content-Type': 'text/plain'
+			});
+
+			res.end('Authorization successful! You can close this page.');
+			return;
+		}
+
+		res.writeHead(400, {
+			'Content-Type': 'text/plain'
+		});
+
+		res.end('Authorization state not valid. Please retry.');
 	});
 	
 	function execute(replyTo, sender, text) {
