@@ -89,6 +89,10 @@
 		"controlSocket": {
 			"path": "/tmp/ircbot.sock"
 		},
+		"githubHook": {
+			"announceChannel": "#example",
+			"secret": "xxxx"
+		},
 		"login": {
 			"username": "notifier",
 			"password": "example"
