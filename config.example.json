@@ -16,6 +16,12 @@
 		}
 	},
 	"modules": {
+		"_httpServer": {
+			"listen": {
+				"host": "::",
+				"port": 1234
+			}
+		},
 		"commands": {
 			"commands": {
 				"cs": {
@@ -31,12 +37,6 @@
 				},
 				"events": true,
 				"fauna": {
-					"http": {
-						"listen": {
-							"host": "::",
-							"port": 1234
-						}
-					},
 					"oauth2": {
 						"credentials": {
 							"client": {
