@@ -207,8 +207,8 @@ module.exports = function(config, ircbot, utils) {
 		console.log(e);
 	}
 
-	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', function(req, res, url, query) {
-		if (!('code' in query) || !('state' in query)) {
+	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', function(req, res) {
+		if (!('code' in req.params) || !('state' in req.params)) {
 			res.writeHead(400, {
 				'Content-Type': 'text/plain'
 			});
@@ -228,7 +228,7 @@ module.exports = function(config, ircbot, utils) {
 				return;
 			}
 
-			if (authState[key].state !== query.state) {
+			if (authState[key].state !== req.params.state) {
 				return;
 			}
 			
@@ -238,7 +238,7 @@ module.exports = function(config, ircbot, utils) {
 		if (accountName) {
 			const userState = authState[accountName];
 			
-			getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, query.code);
+			getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, req.params.code);
 			
 			res.writeHead(200, {
 				'Content-Type': 'text/plain'
