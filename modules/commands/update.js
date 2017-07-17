@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = function(config, ircbot, utils) {
-	function execute(replyTo, sender) {
+	function execute(replyTo) {
 		const child_process = require('child_process');
 
 		let needsUpdate = true;
 		
-		const git = child_process.spawn('git', ['pull', '--ff-only'], {
+		const git = child_process.spawn('git', ['pull', '--ff-only', '--no-stat'], {
 			shell: true
 		});
 		
@@ -16,12 +16,12 @@ module.exports = function(config, ircbot, utils) {
 				ircbot.say(replyTo, data);
 			}
 			else {
-				ircbot.notice(sender, data);
+				ircbot.say(replyTo, data);
 			}
 		});
 
 		git.stderr.on('data', (data) => {
-			ircbot.notice(sender, data);
+			ircbot.say(replyTo, data);
 		});
 		
 		git.on('close', (code) => {
