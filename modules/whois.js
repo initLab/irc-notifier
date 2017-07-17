@@ -18,7 +18,14 @@ module.exports = function(config, ircbot) {
 	ircbot.constructor.prototype.remoteWhois = function(nick, callback) {
 		if (typeof callback === 'function') {
 			var callbackWrapper = function(info) {
-				if (info.nick.toLowerCase() == nick.toLowerCase()) {
+				let whoisNick = '';
+
+				try {
+					whoisNick = info.nick.toLowerCase();
+				}
+				catch (e) {}
+
+				if (whoisNick == nick.toLowerCase()) {
 					this.removeListener('whois', callbackWrapper);
 					return callback.apply(this, arguments);
 				}
