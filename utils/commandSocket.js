@@ -9,6 +9,10 @@ function Socket(options, cmdCallback) {
     server.on('connection', function(connection) {
         console.info('CONTROL: Socket open');
         
+        connection.on('error', function(e) {
+            console.error('CONTROL: Error in socket, code=' + e.code);
+        });
+        
         connection.on('end', function() {
             console.info('CONTROL: Socket closed');
         });
@@ -54,10 +58,10 @@ function Socket(options, cmdCallback) {
 				}
             break;
             case 'EACCES':
-				console.warn('CONTROL: Access denied');
+				console.error('CONTROL: Access denied');
 			break;
             default:
-                throw e;
+                console.error('CONTROL: Error opening socket, code=' + e.code);
             break;
         }
 		
