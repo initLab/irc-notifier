@@ -90,7 +90,7 @@
 			"path": "/tmp/ircbot.sock"
 		},
 		"githubHook": {
-			"announceChannel": "#example",
+			"channel": "#example",
 			"secret": "xxxx"
 		},
 		"login": {

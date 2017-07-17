@@ -26,6 +26,6 @@ module.exports = function(config, ircbot) {
 		});
 		res.end();
 		
-		ircbot.say(config.announceChannel, '[' + message.repository.name + '] ' + message.sender.login + ' triggered event ' + event);
+		ircbot.say(config.channel, '[' + message.repository.name + '] ' + message.sender.login + ' triggered event ' + event);
 	});
 };
