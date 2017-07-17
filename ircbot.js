@@ -2,7 +2,7 @@
 
 'use strict';
 
-const irc = require('irc');
+const irc = require('irc-upd');
 const requireDir = require('require-dir');
 const utils = requireDir('utils');
 
