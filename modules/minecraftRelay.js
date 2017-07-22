@@ -2,7 +2,6 @@
 
 module.exports = function(config, ircbot) {
 	const Rcon = require('rcon');
-
 	const client = new Rcon(config.rcon.host, config.rcon.port, config.rcon.password);
 	
 	client.on('auth', function() {
