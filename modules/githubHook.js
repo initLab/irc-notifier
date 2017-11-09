@@ -3,6 +3,15 @@
 module.exports = function(config, ircbot, utils) {
 	ircbot.emit('registerHttp', 'post', '/hooks/github', function(req, res) {
 		const crypto = require('crypto');
+		
+		if (!('x-hub-signature' in req.headers)) {
+			res.writeHead(400, {
+				'Content-Type': 'text/plain'
+			});
+			res.end('Bad request');
+			return;
+		}
+		
 		const signature = req.headers['x-hub-signature'];
 		const algo = signature.substr(0, signature.indexOf('='));
 		
