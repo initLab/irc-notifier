@@ -27,63 +27,36 @@ function formatEnvironment(type) {
 	return 'unknown';
 }
 
-function checkError(data) {
-	if ('error' in data) {
-		throw new Error(data.error);
-	}
+function formatInfo(state) {
+	return state.raw.game + ' ' + formatServerType(state.raw.listentype) + ' server ' +
+		'(' + state.name + ') at map ' +
+		state.map + ' with ' + state.players.length + ' of ' + state.maxplayers + ' players (' + state.bots.length + ' bots)';
 }
 
-function formatInfo(data) {
-	checkError(data);
-	
-	const result = data.result;
-
-	return result.Game + ' ' + formatServerType(result.ServerType) + ' server ' +
-		'(' + result.Name + ') at map ' +
-		result.Map + ' with ' + result.Players + ' of ' + result.MaxPlayers + ' players (' + result.Bots + ' bots)';
-}
-
-function formatPlayers(data) {
-	checkError(data);
-	
-	return data.result.sort(function(a, b) {
-		return a.Score < b.Score;
-	}).map(function(player) {
-		return [
-			player.Name + ': ' + player.Score + ' frags',
-			player.Duration
-		];
-	});
+function formatPlayer(player, utils) {
+	return player.name + ': ' + player.score + ' frags (' + utils.time.formatTimePeriod(Math.round(player.time)) + ')';
 }
 
 function sendGameStatus(config, ircbot, utils, replyTo) {
-	utils.request.getJson('https://dev.6bez10.info/hlds/?host=' +
-		encodeURIComponent(config.host) +
-		'&port=' +
-		encodeURIComponent(config.port) +
-		'&action=info', function(data) {
+	const Gamedig = require('gamedig');
+	const prefix = config.host + ':' + config.port + ' | ';
 
-		ircbot.say(replyTo, config.host + ':' + config.port + ' | ' + formatInfo(data));
-
-		if (data.result.Players > 0) {
-			utils.request.getJson('https://dev.6bez10.info/hlds/?host=' +
-				encodeURIComponent(config.host) +
-				'&port=' +
-				encodeURIComponent(config.port) +
-				'&action=players', function(data) {
-				
-				const players = formatPlayers(data);
-				
-				players.forEach(function(playerInfo) {
-					ircbot.say(replyTo, config.host + ':' + config.port + ' | ' + playerInfo[0] +
-						' (' + utils.time.formatTimePeriod(Math.round(playerInfo[1])) + ')');
-				});
-			}, function(error) {
-				ircbot.say(replyTo, error);
+	Gamedig.query({
+		type: 'hldm',
+		host: config.host,
+		port: config.port
+	}).then(state => {
+		ircbot.say(replyTo, prefix + formatInfo(state));
+		
+		if (state.players.length > 0) {
+			state.players.sort(function(a, b) {
+				return a.score < b.score;
+			}).forEach(function(player) {
+				ircbot.say(replyTo, prefix + formatPlayer(player, utils));
 			});
 		}
-	}, function(error) {
-		ircbot.say(replyTo, error);
+	}).catch(error => {
+		ircbot.say(replyTo, prefix + 'Error getting server status (' + error + ')');
 	});
 }
 
