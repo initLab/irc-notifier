@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 'use strict';
 
 const irc = require('irc-upd');
