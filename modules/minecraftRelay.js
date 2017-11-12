@@ -3,13 +3,15 @@
 module.exports = function(config, ircbot) {
 	const Rcon = require('rcon');
 	const client = new Rcon(config.rcon.host, config.rcon.port, config.rcon.password);
-	
+
 	client.on('auth', function() {
 		console.log('RCON authentication successful');
 	}).on('response', function(str) {
 		console.log('RCON got response: ' + str);
 	}).on('end', function() {
 		console.log('RCON socket closed');
+	}).on('error', function(e) {
+		console.log('RCON socket connection failed: ' + e.message);
 	});
 
 	client.connect();
