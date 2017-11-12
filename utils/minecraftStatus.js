@@ -1,42 +1,32 @@
 'use strict';
 
-function checkError(data) {
-	if ('error' in data) {
-		throw new Error(data.error);
-	}
+function formatInfo(state) {
+	return 'Minecraft ' + state.raw.version + ' server ' +
+		'(' + state.raw.description + ') with ' + state.players.length + ' of ' + state.maxplayers + ' players';
 }
 
-function formatInfo(data) {
-	checkError(data);
-	
-	const result = data.result;
-
-	return 'Minecraft ' + result.version.name + ' server ' +
-		'(' + result.description.text + ') with ' + result.players.online + ' of ' + result.players.max + ' players';
-}
-
-function formatPlayers(data) {
-	checkError(data);
-	
-	return 'Players online: ' + data.result.players.sample.map(function(player) {
+function formatPlayers(players) {
+	return 'Players online: ' + players.map(function(player) {
 		return player.name;
 	}).join(', ');
 }
 
 function sendGameStatus(config, ircbot, utils, replyTo) {
-	utils.request.getJson('https://dev.6bez10.info/minecraft/?host=' +
-		encodeURIComponent(config.host) +
-		'&port=' +
-		encodeURIComponent(config.port) +
-		'&action=info', function(data) {
+	const Gamedig = require('gamedig');
+	const prefix = config.host + ':' + config.port + ' | ';
 
-		ircbot.say(replyTo, config.host + ':' + config.port + ' | ' + formatInfo(data));
+	Gamedig.query({
+		type: 'minecraftping',
+		host: config.host,
+		port: config.port
+	}).then(state => {
+		ircbot.say(replyTo, prefix + formatInfo(state));
 		
-		if (data.result.players.online > 0) {
-			ircbot.say(replyTo, config.host + ':' + config.port + ' | ' + formatPlayers(data));
+		if (state.players.length > 0) {
+			ircbot.say(replyTo, prefix + formatPlayers(state.players));
 		}
-	}, function(error) {
-		ircbot.say(replyTo, error);
+	}).catch(error => {
+		ircbot.say(replyTo, prefix + 'Error getting server status (' + error + ')');
 	});
 }
 
