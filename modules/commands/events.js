@@ -18,12 +18,19 @@ module.exports = function(config, ircbot, utils) {
 			
 			// get all events
 			const events = data.rss.channel[0].item;
+			
+			if (events.length === 0) {
+				ircbot.say(replyTo, 'No events found, something is wrong :(');
+				return;
+			}
 
 			// parse the start time
 			for (let i = 0; i < events.length; ++i) {
 				const ts = Date.parse(events[i].pubDate[0]);
+				const dt = new Date(ts);
 				events[i].timestamp = ts;
-				events[i].datetime = new Date(ts);
+				events[i].datetime = dt;
+				events[i].date = dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate();
 			}
 
 			// sort by start time ascending
@@ -35,20 +42,35 @@ module.exports = function(config, ircbot, utils) {
 
 			// select events
 			let selectedEvents = [];
+			const todayHasEvents = utils.time.isToday(sortedEvents[0]);
 			
+			let lastDate = null;
 			for (let i = 0; i < sortedEvents.length; ++i) {
 				const event = sortedEvents[i];
-				const today = utils.time.isToday(event.datetime);
 				
-				// if there are events today, show all of them
-				// if not, show the next one
-				if (!today && i > 0) {
-					break;
+				if (todayHasEvents) {
+					// show today's events
+					// also show next day's events
+					
+					if (lastDate !== null && event.date !== lastDate) {
+						break;
+					}
+					
+					if (event.date !== sortedEvents[0].date) {
+						lastDate = event.date;
+					}
+				}
+				else {
+					// show events that happen on the first date with events
+					
+					if (event.date !== sortedEvents[0].date) {
+						break;
+					}
 				}
 				
 				selectedEvents.push(event);
 			}
-			
+
 			// send to IRC
 			async.map(selectedEvents, (event, callback) => shortenEventUrl(event, callback, utils), function(err, results) {
 				try {
