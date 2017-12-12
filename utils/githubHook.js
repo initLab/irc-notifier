@@ -1,6 +1,12 @@
 'use strict';
 
-function formatMessage(event, payload) {
+const hashAbbrevLength = 7;
+
+function formatHash(longHash) {
+	return longHash.substr(0, hashAbbrevLength);
+}
+
+function formatMessage(utils, event, payload, callback) {
 	let message = [];
 	
 	if (payload.repository) {
@@ -12,9 +18,17 @@ function formatMessage(event, payload) {
 	switch (event) {
 		case 'commit_comment':
 			message.push('commented on');
-			message.push(payload.comment.commit_id);
+			message.push(formatHash(payload.comment.commit_id));
 			message.push('-');
-			message.push(payload.comment.html_url);
+			utils.url.shorten(utils.request, payload.comment.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		case 'create':
 			message.push('created');
@@ -40,14 +54,109 @@ function formatMessage(event, payload) {
 		// case 'installation': // not supported by formatter
 		// case 'installation_repositories': // not supported by formatter
 		case 'issue_comment':
-			message.push(payload.action);
-			message.push('a comment in this issue:');
-			message.push(payload.issue.html_url);
+			switch (payload.action) {
+				case 'created':
+					message.push('commented in');
+					break;
+				case 'edited':
+					message.push('edited a comment in');
+					break;
+				case 'deleted':
+					message.push('deleted a comment in');
+					break;
+			}
+			message.push('#' + payload.issue.number);
+			message.push('(' + payload.issue.title + ')');
+			message.push('-');
+			utils.url.shorten(utils.request, payload.comment.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		case 'issues':
-			message.push(payload.action);
-			message.push('the following issue:');
-			message.push(payload.issue.html_url);
+			switch (payload.action) {
+				case 'assigned':
+					if (payload.sender.id === payload.assignee.id) {
+						message.push('self-' + payload.action);
+					}
+					else {
+						message.push(payload.action);
+					}
+					break;
+				case 'unassigned':
+					if (payload.sender.id === payload.assignee.id) {
+						message.push('removed their assignment from');
+					}
+					else {
+						message.push(payload.action);
+					}
+					break;
+				case 'labeled':
+					message.push('added the');
+					message.push('"' + payload.label.name + '"');
+					message.push('label to');
+					break;
+				case 'unlabeled':
+					message.push('removed');
+					if ('label' in payload) {
+						message.push('the');
+						message.push('"' + payload.label.name + '"');
+						message.push('label');
+					}
+					else {
+						message.push('a label');
+					}
+					message.push('from');
+					break;
+				case 'milestoned':
+					message.push('added');
+					break;
+				case 'demilestoned':
+					message.push('removed');
+					break;
+				default:
+					message.push(payload.action);
+					break;
+			}
+			message.push('#' + payload.issue.number);
+			message.push('(' + payload.issue.title + ')');
+			switch (payload.action) {
+				case 'assigned':
+					if (payload.sender.id !== payload.assignee.id) {
+						message.push('to');
+						message.push(payload.assignee.login);
+					}
+					break;
+				case 'unassigned':
+					if (payload.sender.id !== payload.assignee.id) {
+						message.push('from');
+						message.push(payload.assignee.login);
+					}
+					break;
+				case 'milestoned':
+					message.push('to the');
+					message.push('"' + payload.issue.milestone.title + '"');
+					message.push('milestone');
+					break;
+				case 'demilestoned':
+					message.push('from its milestone');
+					break;
+			}
+			message.push('-');
+			utils.url.shorten(utils.request, payload.issue.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		case 'label':
 			message.push(payload.action);
@@ -56,8 +165,27 @@ function formatMessage(event, payload) {
 			break;
 		// case 'marketplace_purchase': // not supported by formatter
 		case 'member':
+			if (payload.sender.id === payload.member.id) {
+				switch (payload.action) {
+					case 'added':
+						message.push('joined the repository');
+						break;
+					case 'edited':
+						message.push('edited their permissions to the repository');
+						break;
+					case 'deleted':
+						message.push('left the repository');
+						break;
+				}
+				break;
+			}
+			
 			message.push(payload.action);
-			message.push('member');
+			
+			if (payload.action === 'edited') {
+				message.push('the permissions of');
+			}
+			
 			message.push(payload.member.login);
 			break;
 		case 'membership':
@@ -72,7 +200,15 @@ function formatMessage(event, payload) {
 			message.push(payload.action);
 			message.push('milestone');
 			message.push(payload.milestone.title);
-			message.push(payload.milestone.html_url);
+			utils.url.shorten(utils.request, payload.milestone.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		// case 'organization': // not supported by formatter
 		// case 'org_block': // not supported by formatter
@@ -88,11 +224,30 @@ function formatMessage(event, payload) {
 			message.push('made the repository public');
 			break;
 		case 'pull_request':
-			message.push(payload.action);
+			switch (payload.action) {
+				case 'review_requested':
+					message.push('requested review in');
+					break;
+				case 'review_request_removed':
+					message.push('removed a review request in');
+					break;
+				default:
+					message.push(payload.action);
+					break;
+			}
 			message.push('pull request');
 			message.push('#' + payload.pull_request.number);
-			message.push(payload.pull_request.title);
-			message.push(payload.pull_request.html_url);
+			message.push('(' + payload.pull_request.title + ')');
+			message.push('-');
+			utils.url.shorten(utils.request, payload.pull_request.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		// case 'pull_request_review': // not supported by formatter
 		// case 'pull_request_review_comment': // not supported by formatter
@@ -121,7 +276,7 @@ function formatMessage(event, payload) {
 							payload.distinct_commits.length === 0
 						) {
 							message.push('at');
-							message.push(payload.after);
+							message.push(formatHash(payload.after));
 						}
 					}
 					
@@ -136,16 +291,16 @@ function formatMessage(event, payload) {
 					message.push('deleted');
 					message.push(payload.ref_name);
 					message.push('at');
-					message.push(payload.before);
+					message.push(formatHash(payload.before));
 				}
 				else {
 					if (payload.forced) {
 						message.push('force-pushed');
 						message.push(payload.ref_name);
 						message.push('from');
-						message.push(payload.before);
+						message.push(formatHash(payload.before));
 						message.push('to');
-						message.push(payload.after);
+						message.push(formatHash(payload.after));
 					}
 					else {
 						if (payload.commits && !payload.distinct_commits) {
@@ -159,9 +314,9 @@ function formatMessage(event, payload) {
 								message.push('fast-forwarded');
 								message.push(payload.ref_name);
 								message.push('from');
-								message.push(payload.before);
+								message.push(formatHash(payload.before));
 								message.push('to');
-								message.push(payload.after);
+								message.push(formatHash(payload.after));
 							}
 						}
 						else {
@@ -180,7 +335,15 @@ function formatMessage(event, payload) {
 			message.push(payload.action);
 			message.push('release');
 			message.push(payload.release.tag_name);
-			message.push(payload.release.html_url);
+			utils.url.shorten(utils.request, payload.release.html_url, function(url, error) {
+				if (url === null) {
+					console.log(error);
+					return;
+				}
+				message.push(url);
+				callback(message.join(' '));
+			});
+			return;
 			break;
 		case 'repository':
 			message.push(payload.action);
@@ -188,7 +351,7 @@ function formatMessage(event, payload) {
 			break;
 		// case 'status': // not supported by formatter
 		case 'team':
-			message.push(payload.action);
+			message.push(payload.action.replace('_', ' '));
 			message.push('team');
 			message.push(payload.team.name);
 			break;
@@ -202,9 +365,16 @@ function formatMessage(event, payload) {
 			break;
 	}
 	
-	return message.join(' ');
+	callback(message.join(' '));
+}
+
+function sendMessage(ircbot, utils, recipient, event, payload) {
+	formatMessage(utils, event, payload, function(message) {
+		ircbot.say(recipient, message);
+	});
 }
 
 module.exports = {
-	formatMessage: formatMessage
+	formatMessage: formatMessage,
+	sendMessage: sendMessage
 };

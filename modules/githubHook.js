@@ -29,11 +29,9 @@ module.exports = function(config, ircbot, utils) {
 		const event = req.headers['x-github-event'];
 		const payload = JSON.parse(req.body);
 		
-		res.writeHead(204, {
-			'Content-Type': 'text/plain'
-		});
+		res.writeHead(204);
 		res.end();
 		
-		ircbot.say(config.channel, utils.githubHook.formatMessage(event, payload));
+		utils.githubHook.sendMessage(ircbot, utils, config.channel, event, payload);
 	});
 };

@@ -21,11 +21,11 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 						throw err;
 					}
 					
-					onSuccess.call(response, result);
+					onSuccess.call(response, result, response.headers);
 				});
 			}
 			
-			onSuccess.call(response, body);
+			onSuccess.call(response, body, response.headers);
 		}
 		catch (e) {
 			console.error(e.stack);
@@ -65,6 +65,14 @@ function getXml(url, onSuccess, onError) {
 	});
 }
 
+function post(url, data, onSuccess, onError) {
+	return makeRequest({
+		method: 'POST',
+		url: url,
+		form: data
+	}, onSuccess, onError);
+}
+
 function postOAuth2(url, data, token, onSuccess, onError) {
 	return makeRequest({
 		method: 'POST',
@@ -81,5 +89,6 @@ module.exports = {
 	getJson: getJson,
 	getJsonOAuth2: getJsonOAuth2,
 	getXml: getXml,
+	post: post,
 	postOAuth2: postOAuth2
 };
