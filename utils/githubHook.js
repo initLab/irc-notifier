@@ -349,7 +349,30 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(payload.action);
 			message.push('the repository');
 			break;
-		// case 'status': // not supported by formatter
+		case 'status':
+			message.push('changed status of commit');
+			message.push(formatHash(payload.sha));
+			message.push('to');
+			message.push(payload.state);
+			
+			if (payload.description) {
+				message.push('(' + payload.description + ')');
+			}
+			
+			if (payload.target_url) {
+				message.push('-');
+				
+				utils.url.shorten(utils.request, payload.target_url, function(url, error) {
+					if (url === null) {
+						console.log(error);
+						return;
+					}
+					message.push(url);
+					callback(message.join(' '));
+				});
+				return;
+			}
+			break;
 		case 'team':
 			message.push(payload.action.replace('_', ' '));
 			message.push('team');
