@@ -8,9 +8,11 @@ function shorten(request, longUrl, callback) {
 			return callback(headers.location);
 		}
 		
-		callback(null, 'Location header not found');
+		console.log('Location data not found', data, headers);
+		callback(longUrl);
 	}, function(error) {
-		callback(null, error);
+		console.log(error);
+		callback(longUrl);
 	});
 }
 
