@@ -13,6 +13,11 @@ module.exports = function(config, ircbot, utils) {
 		}
 		
 		utils.request.getJson('https://fauna.initlab.org/api/users/present.json', function(data) {
+			if ('status' in data && 'error' in data) {
+				ircbot.say(replyTo, 'Request error: ' + data.error + ' (code ' + data.status + ')');
+				return;
+			}
+			
 			if (data.length === 0) {
 				ircbot.say(replyTo, 'No one in init Lab :(');
 				return;
