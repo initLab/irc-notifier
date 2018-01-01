@@ -2,7 +2,7 @@
 
 function shortenEventUrl(event, callback, utils) {
 	const url = event.link[0];
-
+	
 	utils.request.get('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url), function(data) {
 		event.shortUrl = data;
 		callback(null, event);
@@ -16,14 +16,19 @@ module.exports = function(config, ircbot, utils) {
 		utils.request.getXml('https://initlab.org/events/feed/', function(data) {
 			const async = require('async');
 			
+			if (!('item' in data.rss.channel[0])) {
+				ircbot.say(replyTo, 'No events found :(');
+				return;
+			}
+			
 			// get all events
 			const events = data.rss.channel[0].item;
 			
 			if (events.length === 0) {
-				ircbot.say(replyTo, 'No events found, something is wrong :(');
+				ircbot.say(replyTo, 'No events found :(');
 				return;
 			}
-
+			
 			// parse the start time
 			for (let i = 0; i < events.length; ++i) {
 				const ts = Date.parse(events[i].pubDate[0]);
