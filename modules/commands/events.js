@@ -3,11 +3,13 @@
 function shortenEventUrl(event, callback, utils) {
 	const url = event.link[0];
 	
-	utils.request.get('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url), function(data) {
-		event.shortUrl = data;
+	utils.url.shorten(utils.request, url, function(shortUrl) {
+		if (shortUrl === url) {
+			return callback(new Error('URL shortening failed'), event);
+		}
+		
+		event.shortUrl = shortUrl;
 		callback(null, event);
-	}, function(error) {
-		callback(error, event);
 	});
 }
 
