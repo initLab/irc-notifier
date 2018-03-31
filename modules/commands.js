@@ -6,22 +6,26 @@ module.exports = function(config, ircbot, utils) {
 	const commands = utils.moduleLoader.apply(utils, args);
 
 	function executeCommand(sender, replyTo, text) {
+		if (!['!', '.'].includes(text.charAt(0))) {
+			return;
+		}
+
 		Object.keys(commands).forEach(function(key) {
 			const command = commands[key];
 			
 			if (!('key' in command) || !('execute' in command)) {
 				return;
 			}
-
-			const commandPrefix = '!' + command.key.toLowerCase();
-			const lowercaseMessage = text.toLowerCase();
 			
-			if (lowercaseMessage !== commandPrefix && lowercaseMessage.indexOf(commandPrefix + ' ') !== 0) {
+			const commandKey = command.key.toLowerCase();
+			const lowercaseMessage = text.substr(1).toLowerCase();
+			
+			if (lowercaseMessage !== commandKey && lowercaseMessage.indexOf(commandKey + ' ') !== 0) {
 				return;
 			}
 			
 			try {
-				command.execute(replyTo, sender, text.substr(commandPrefix.length + 1), commands);
+				command.execute(replyTo, sender, text.substr(1 + command.key.length + 1), commands);
 			}
 			catch (e) {
 				ircbot.say(replyTo, 'Error executing command "' + command.key + '": ' + e.message);
