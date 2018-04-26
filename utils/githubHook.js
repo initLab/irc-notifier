@@ -13,7 +13,9 @@ function formatMessage(utils, event, payload, callback) {
 		message.push('[' + payload.repository.full_name + ']');
 	}
 	
-	message.push(payload.sender.login);
+	if (payload.sender) {
+		message.push(payload.sender.login);
+	}
 	
 	switch (event) {
 		case 'commit_comment':
@@ -348,6 +350,19 @@ function formatMessage(utils, event, payload, callback) {
 		case 'repository':
 			message.push(payload.action);
 			message.push('the repository');
+			break;
+		case 'repository_vulnerability_alert':
+			message.push('Vulnerability alert');
+			message.push(payload.action);
+			message.push('in package');
+			message.push(payload.alert.affected_package_name);
+			message.push(payload.alert.affected_range);
+			if (payload.alert.dismisser) {
+				message.push('by');
+				message.push(payload.alert.dismisser.login);
+			}
+			message.push(', problem fixed in');
+			message.push(payload.alert.fixed_in);
 			break;
 		case 'status':
 			message.push('changed status of commit');
