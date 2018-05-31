@@ -365,6 +365,11 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(payload.alert.fixed_in);
 			break;
 		case 'status':
+			if (payload.state === 'pending') {
+				// too much spam
+				return;
+			}
+			
 			message.push('changed status of commit');
 			message.push(formatHash(payload.sha));
 			message.push('to');
