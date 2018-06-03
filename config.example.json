@@ -75,6 +75,7 @@
 					"port": 25565
 				},
 				"music": true,
+				"power": true,
 				"sun": {
 					"lat": 42.70789247,
 					"lng": 23.32527086
@@ -82,8 +83,13 @@
 				"update": {
 					"startupScript": "/home/user/irc-notifier/start.sh"
 				},
+				"weather": true,
 				"who": true,
-				"whois": true
+				"whois": true,
+				"xon": {
+					"host": "example.com",
+					"port": 26000
+				}
 			}
 		},
 		"console": true,
