@@ -40,6 +40,12 @@ function get(url, onSuccess, onError) {
 	}, onSuccess, onError);
 }
 
+function getWithOptions(url, options, onSuccess, onError) {
+	options.url = url;
+	
+	return makeRequest(options, onSuccess, onError);
+}
+
 function getJson(url, onSuccess, onError) {
 	return makeRequest({
 		url: url,
@@ -86,6 +92,7 @@ function postOAuth2(url, data, token, onSuccess, onError) {
 
 module.exports = {
 	get: get,
+	getWithOptions: getWithOptions,
 	getJson: getJson,
 	getJsonOAuth2: getJsonOAuth2,
 	getXml: getXml,
