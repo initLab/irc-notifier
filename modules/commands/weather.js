@@ -2,7 +2,7 @@
 
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo, sender, text) {
-		utils.request.getWithOptions('https://wttr.in/' + encodeURIComponent(text) + '?mM0Q&lang=bg', {
+		utils.request.getWithOptions('https://wttr.in/' + encodeURIComponent(text) + '?mM0q&lang=bg', {
 			headers: {
 				'User-Agent': 'request (Compatible; curl)'
 			}
