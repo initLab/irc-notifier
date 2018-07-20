@@ -21,15 +21,22 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 						throw err;
 					}
 					
-					onSuccess.call(response, result, response.headers);
+					if (onSuccess) {
+						onSuccess.call(response, result, response.headers);
+					}
 				});
 			}
 			
-			onSuccess.call(response, body, response.headers);
+			if (onSuccess) {
+				onSuccess.call(response, body, response.headers);
+			}
 		}
 		catch (e) {
 			console.error(e.stack);
-			onError.call(response, e);
+			
+			if (onError) {
+				onError.call(response, e);
+			}
 		}
 	});
 }
