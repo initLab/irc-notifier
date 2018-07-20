@@ -1,6 +1,6 @@
 'use strict';
 
-const url = require('url');
+const { URL } = require('url');
 
 module.exports = function(config, ircbot, utils) {
 	ircbot.addListener('message', function(from, to, message) {
@@ -8,7 +8,8 @@ module.exports = function(config, ircbot, utils) {
 
 		for (let i = 0; i < parts.length; i++) {
 			try {
-				const urlObj = url.parse(parts[i]);
+				const urlObj = new URL(parts[i]);
+
 				utils.request.get(urlObj.href, function(data) {
 					const matches = data.match(/<title ?.*?>([^<]*)<\/title>/i);
 					
