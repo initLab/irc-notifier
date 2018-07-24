@@ -20,6 +20,7 @@
     "async": "^2.1.2",
     "gamedig": "^1.0.45",
     "httpdispatcher": "^2.1.2",
+    "iconv-lite": "^0.4.23",
     "irc-upd": "^0.6.2",
     "rcon": "^1.0.3",
     "request": "^2.85.0",
