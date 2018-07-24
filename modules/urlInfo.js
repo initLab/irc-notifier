@@ -15,7 +15,7 @@ module.exports = function(config, ircbot, utils) {
 					
 					if (matches && matches[1]) {
 						// we have found a title element
-						ircbot.say(to, '^ ' + utils.html.decodeEntities(matches[1]) + ' ^');
+						ircbot.say(to, '^ ' + utils.html.decodeEntities(matches[1].trim()) + ' ^');
 					}
 				}); // request errors are silently discarded
 				
