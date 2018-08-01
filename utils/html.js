@@ -11,8 +11,8 @@ function decodeEntities(encodedString) {
     };
     return encodedString.replace(translate_re, function(match, entity) {
         return translate[entity];
-    }).replace(/&#(\d+);/gi, function(match, numStr) {
-        const num = parseInt(numStr, 10);
+    }).replace(/&#(x)?(\d+);/gi, function(match, isHex, numStr) {
+        const num = parseInt(numStr, isHex ? 16 : 10);
         return String.fromCharCode(num);
     });
 }
