@@ -39,20 +39,23 @@ function parseCharset(data, headers) {
 		const tag = matches[i][0].toLowerCase();
 		
 		// <meta http-equiv="Content-Type" content="text/html; charset=xxx">
-		if (tag.indexOf(' http-equiv="content-type"') > -1) {
-			const metaMatch1 = tag.match(/content="([^"]*)"/);
+		if (
+            tag.indexOf(' http-equiv="content-type"') > -1 ||
+            tag.indexOf(' http-equiv=\'content-type\'') > -1
+        ) {
+			const metaMatch1 = tag.match(/content=(?:"([^"]*)"|'([^']*)')/);
 			
 			if (metaMatch1) {
-				httpEquivCharset = matchCharsetInCt(metaMatch1[1]);
+				httpEquivCharset = matchCharsetInCt(metaMatch1[1] || metaMatch1[2]);
 				continue;
 			}
 		}
 
 		// <meta charset="xxx">
-		const metaMatch2 = tag.match(/charset="([^"]*)"/);
+		const metaMatch2 = tag.match(/charset=(?:"([^"]*)"|'([^']*)')/);
 		
 		if (metaMatch2) {
-			metaCharset = metaMatch2[1];
+			metaCharset = metaMatch2[1] || metaMatch2[2];
 			continue;
 		}
 
