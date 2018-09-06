@@ -11,7 +11,10 @@ module.exports = function(config, ircbot, utils) {
 				const urlObj = new URL(parts[i]);
 
 				utils.request.getWithOptions(urlObj.href, {
-					encoding: null
+					encoding: null,
+					headers: {
+						'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+					}
 				}, function(data, headers) {
 					const matches = utils.http.decodeBuffer(data, headers).match(/<title ?.*?>([^<]*)<\/title>/i);
 					
