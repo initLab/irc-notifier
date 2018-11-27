@@ -17,15 +17,15 @@
   },
   "homepage": "https://github.com/initLab/irc-notifier#readme",
   "dependencies": {
-    "async": "^2.1.2",
-    "gamedig": "^1.0.45",
+    "async": "^2.6.1",
+    "gamedig": "^1.0.47",
     "httpdispatcher": "^2.1.2",
-    "iconv-lite": "^0.4.23",
+    "iconv-lite": "^0.4.24",
     "irc-upd": "^0.6.2",
     "rcon": "^1.0.3",
-    "request": "^2.85.0",
+    "request": "^2.88.0",
     "require-dir": "^0.3.0",
-    "simple-oauth2": "^1.5.2",
+    "simple-oauth2": "^1.6.0",
     "xml2js": "^0.4.17"
   }
 }
