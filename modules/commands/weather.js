@@ -6,14 +6,8 @@ module.exports = function(config, ircbot, utils) {
 			text = 'Sofia';
 		}
 		
-		utils.request.getWithOptions('https://wttr.in/' + encodeURIComponent(text) + '?mM0q&lang=bg', {
-			headers: {
-				'User-Agent': 'request (Compatible; curl)'
-			}
-		}, function(data) {
-			ircbot.say(replyTo, data.replace(/\x1b\[([0-9;]*)([mGKH])/g, function(match, codes, command, offset, string) {
-				return '';
-			}));
+		utils.request.getWithOptions('https://wttr.in/' + encodeURIComponent(text) + '?format=' + encodeURIComponent('%l: %c %t %w %m'), function(data) {
+			ircbot.say(replyTo, data);
 		}, function(error) {
 			ircbot.say(replyTo, error);
 		});
