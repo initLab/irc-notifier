@@ -22,11 +22,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push('commented on');
 			message.push(formatHash(payload.comment.commit_id));
 			message.push('-');
-			utils.url.shorten(utils.request, payload.comment.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.comment.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -70,11 +66,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push('#' + payload.issue.number);
 			message.push('(' + payload.issue.title + ')');
 			message.push('-');
-			utils.url.shorten(utils.request, payload.comment.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.comment.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -150,11 +142,7 @@ function formatMessage(utils, event, payload, callback) {
 					break;
 			}
 			message.push('-');
-			utils.url.shorten(utils.request, payload.issue.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.issue.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -202,11 +190,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(payload.action);
 			message.push('milestone');
 			message.push(payload.milestone.title);
-			utils.url.shorten(utils.request, payload.milestone.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.milestone.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -241,11 +225,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push('#' + payload.pull_request.number);
 			message.push('(' + payload.pull_request.title + ')');
 			message.push('-');
-			utils.url.shorten(utils.request, payload.pull_request.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.pull_request.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -337,11 +317,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(payload.action);
 			message.push('release');
 			message.push(payload.release.tag_name);
-			utils.url.shorten(utils.request, payload.release.html_url, function(url, error) {
-				if (url === null) {
-					console.log(error);
-					return;
-				}
+			utils.url.shorten(utils.request, payload.release.html_url, function(url) {
 				message.push(url);
 				callback(message.join(' '));
 			});
@@ -381,12 +357,7 @@ function formatMessage(utils, event, payload, callback) {
 			
 			if (payload.target_url) {
 				message.push('-');
-				
-				utils.url.shorten(utils.request, payload.target_url, function(url, error) {
-					if (url === null) {
-						console.log(error);
-						return;
-					}
+				utils.url.shorten(utils.request, payload.target_url, function(url) {
 					message.push(url);
 					callback(message.join(' '));
 				});
