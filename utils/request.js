@@ -9,6 +9,10 @@ function makeRequest(options, onSuccess, onError, parseOptions) {
 				throw error;
 			}
 			
+			if (response && response.statusCode >= 500) {
+				throw new Error('Server error, status code=' + response.statusCode);
+			}
+			
 			if (response && response.statusCode >= 400 && !body) {
 				throw new Error('Error getting data, status code=' + response.statusCode);
 			}
