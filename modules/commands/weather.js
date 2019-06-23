@@ -6,7 +6,7 @@ module.exports = function(config, ircbot, utils) {
 			text = 'Sofia';
 		}
 		
-		utils.request.getWithOptions('https://wttr.in/' + encodeURIComponent(text) + '?format=' + encodeURIComponent('%l: %c %t %w %m'), function(data) {
+		utils.request.get('https://wttr.in/' + encodeURIComponent(text) + '?format=' + encodeURIComponent('%l: %c %t %w %m'), function(data) {
 			ircbot.say(replyTo, data);
 		}, function(error) {
 			ircbot.say(replyTo, error);
