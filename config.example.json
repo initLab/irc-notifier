@@ -54,7 +54,7 @@
 						},
 						"authParams": {
 							"redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
-							"scope": "public door_control door_latch_control"
+							"scope": "public account_data_read door_handle_control door_latch_control"
 						}
 					},
 					"urls": {
