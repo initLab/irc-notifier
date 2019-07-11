@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/initLab/irc-notifier#readme",
   "dependencies": {
-    "async": "^2.6.1",
-    "gamedig": "^1.0.47",
+    "async": "^2.6.2",
+    "gamedig": "^1.0.49",
     "httpdispatcher": "^2.1.2",
     "iconv-lite": "^0.4.24",
     "irc-upd": "^0.6.2",
