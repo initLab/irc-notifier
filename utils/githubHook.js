@@ -370,9 +370,13 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(payload.team.name);
 			break;
 		// case 'team_add': // not supported by formatter
+		case 'star':
 		case 'watch': // https://developer.github.com/changes/2012-09-05-watcher-api/
 			message.push('starred the repository');
 			break;
+		//case 'star':
+		//	message.push('starred the repository');
+		//	break;
 		default:
 			message.push('triggered event');
 			message.push(event);
