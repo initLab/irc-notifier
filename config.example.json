@@ -31,9 +31,10 @@
 				},
 				"door": true,
 				"env": {
-					"channels": {
-						"123": "Example",
-						"456": "Example 2"
+					"url": "http://example.com/status",
+					"sensors": {
+						"sensor-1": "Example",
+						"sensor-2": "Example 2"
 					}
 				},
 				"events": true,
