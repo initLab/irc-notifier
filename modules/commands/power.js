@@ -33,7 +33,7 @@ module.exports = function(config, ircbot, utils) {
 			if (statusChanges.length > 1) {
 				var ts = statusChanges[statusChanges.length - 1][1];
 				sinceText = ' since ' + utils.time.formatDateTimeShort(ts * 1000) +
-				' (' + utils.time.formatTimePeriod(Math.floor(Date.now() / 1000) - ts, true) + ')';
+				' (' + utils.time.formatTimePeriod(Math.floor(Date.now() / 1000) - ts, true, 'ago') + ')';
 			}
 			
 			ircbot.say(replyTo, 

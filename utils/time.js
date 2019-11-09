@@ -45,7 +45,7 @@ function formatDateTimeShort(date) {
 	return (isToday(date) ? '' : (formatDate(date) + ' ')) + formatTimeShort(date);
 }
 
-function formatTimePeriod(seconds, shortTexts) {
+function formatTimePeriod(seconds, shortTexts, suffix) {
 	seconds = Math.floor(seconds);
 	let minutes = Math.floor(seconds / 60);
 	seconds -= minutes * 60;
@@ -66,7 +66,17 @@ function formatTimePeriod(seconds, shortTexts) {
 		day_length.push(seconds + (shortTexts ? 's' : ' seconds'));
 	}
 	
-	return day_length.join(' ');
+	if (day_length.length === 0) {
+		return 'now';
+	}
+	
+	let result = day_length.join(' ');
+	
+	if (suffix) {
+		result += ' ' + suffix;
+	}
+	
+	return result;
 }
 
 function isToday(date) {

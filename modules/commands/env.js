@@ -1,23 +1,40 @@
 'use strict';
 
 module.exports = function(config, ircbot, utils) {
+	const UNITS = {
+		'temperature': '°C',
+		'humidity': '%'
+	};
+	
 	function execute(replyTo) {
 		utils.request.getJson(config.url, function(data) {
 			for (let sensor in config.sensors) {
-				const tempKey = sensor + '/temperature';
-				const humKey = sensor + '/humidity';
+				let values = [];
 				
-				if (!(tempKey in data) || !(humKey in data)) {
+				['temperature', 'humidity'].forEach(function(value) {
+					const key = sensor + '/' + value;
+					
+					if (!(key in data)) {
+						return;
+					}
+					
+					const currValue = data[key];
+					const label = value[0].toUpperCase() + value.substr(1);
+					const delta = Math.max(0, Date.now() - currValue.timestamp) / 1000;
+					const formattedTime = utils.time.formatTimePeriod(delta, true, 'ago');
+					
+					values.push(
+						label + ': ' +
+						parseFloat(currValue.value).toFixed(1) + UNITS[value] +
+						' (' + formattedTime + ')'
+					);
+				});
+				
+				if (values.length === 0) {
 					continue;
 				}
 				
-				const temperature = parseFloat(data[tempKey]);
-				const humidity = parseFloat(data[humKey]);
-
-				ircbot.say(replyTo, config.sensors[sensor] + ': ' +
-					'Temperature: ' + temperature.toFixed(1) + '°C / ' +
-					'Humidity: ' + humidity.toFixed(1) + '%'
-				);
+				ircbot.say(replyTo, config.sensors[sensor] + ': ' + values.join(' / '));
 			}
 		}, function(error) {
 			ircbot.say(replyTo, 'Env error: ' + error);
