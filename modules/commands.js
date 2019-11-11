@@ -6,6 +6,10 @@ module.exports = function(config, ircbot, utils) {
 	const commands = utils.moduleLoader.apply(utils, args);
 
 	function executeCommand(sender, replyTo, text) {
+		if (!sender || !replyTo) {
+			return;
+		}
+		
 		if (!['!', '.'].includes(text.charAt(0))) {
 			return;
 		}
