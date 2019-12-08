@@ -3,7 +3,8 @@
 module.exports = function(config, ircbot, utils) {
 	const UNITS = {
 		'temperature': '°C',
-		'humidity': '%'
+		'humidity': '%',
+		'pressure': 'hPa'
 	};
 	
 	function execute(replyTo) {
@@ -11,7 +12,7 @@ module.exports = function(config, ircbot, utils) {
 			for (let sensor in config.sensors) {
 				let values = [];
 				
-				['temperature', 'humidity'].forEach(function(value) {
+				Object.keys(UNITS).forEach(function(value) {
 					const key = sensor + '/' + value;
 					
 					if (!(key in data)) {
