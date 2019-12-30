@@ -4,7 +4,9 @@ module.exports = function(config, ircbot, utils) {
 	const UNITS = {
 		'temperature': '°C',
 		'humidity': '%',
-		'pressure': 'hPa'
+		'pressure': 'hPa',
+		'power': 'W',
+		'energy': 'kWh'
 	};
 	
 	function execute(replyTo) {
