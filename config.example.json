@@ -37,7 +37,9 @@
 						"sensor-2": "Example 2"
 					}
 				},
-				"events": true,
+				"events": {
+					"rssUrl": "https://example.com/feed/"
+				},
 				"fauna": {
 					"oauth2": {
 						"credentials": {

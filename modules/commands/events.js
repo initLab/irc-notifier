@@ -1,59 +1,19 @@
 'use strict';
 
-function shortenEventUrl(event, callback, utils) {
-	const url = event.link[0];
-	
-	utils.url.shorten(utils.request, url, function(shortUrl) {
-		if (shortUrl === url) {
-			return callback(new Error('URL shortening failed'), event);
-		}
-		
-		event.shortUrl = shortUrl;
-		callback(null, event);
-	});
-}
-
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo) {
-		utils.request.getXml('https://initlab.org/events/feed/', function(data) {
-			const async = require('async');
-			
-			if (!('item' in data.rss.channel[0])) {
-				ircbot.say(replyTo, 'No events found :(');
-				return;
+		utils.rss.getEvents(config, utils, function(events) {
+			if (events instanceof Error) {
+				return ircbot.say(replyTo, events.message);
 			}
 			
-			// get all events
-			const events = data.rss.channel[0].item;
-			
-			if (events.length === 0) {
-				ircbot.say(replyTo, 'No events found :(');
-				return;
-			}
-			
-			// parse the start time
-			for (let i = 0; i < events.length; ++i) {
-				const ts = Date.parse(events[i].pubDate[0]);
-				const dt = new Date(ts);
-				events[i].timestamp = ts;
-				events[i].datetime = dt;
-				events[i].date = dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate();
-			}
-
-			// sort by start time ascending
-			const sortedEvents = events.sort(function(a, b) {
-				const key = 'timestamp';
-				const x = a[key], y = b[key];
-				return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-			});
-
 			// select events
 			let selectedEvents = [];
-			const todayHasEvents = utils.time.isToday(sortedEvents[0]);
+			const todayHasEvents = utils.time.isToday(events[0]);
 			
 			let lastDate = null;
-			for (let i = 0; i < sortedEvents.length; ++i) {
-				const event = sortedEvents[i];
+			for (let i = 0; i < events.length; ++i) {
+				const event = events[i];
 				
 				if (todayHasEvents) {
 					// show today's events
@@ -63,14 +23,14 @@ module.exports = function(config, ircbot, utils) {
 						break;
 					}
 					
-					if (event.date !== sortedEvents[0].date) {
+					if (event.date !== events[0].date) {
 						lastDate = event.date;
 					}
 				}
 				else {
 					// show events that happen on the first date with events
 					
-					if (event.date !== sortedEvents[0].date) {
+					if (event.date !== events[0].date) {
 						break;
 					}
 				}
@@ -78,28 +38,7 @@ module.exports = function(config, ircbot, utils) {
 				selectedEvents.push(event);
 			}
 
-			// send to IRC
-			async.map(selectedEvents, (event, callback) => shortenEventUrl(event, callback, utils), function(err, results) {
-				try {
-					if (err !== null) {
-						throw err;
-					}
-					
-					for (let i = 0; i < results.length; ++i) {
-						const event = results[i];
-						
-						ircbot.say(replyTo, '[' + utils.time.formatDateTimeShort(event.datetime) + '] ' +
-							event.title + ' ' + event.shortUrl);
-					}
-				}
-				catch (e) {
-					console.error(e.stack);
-					ircbot.say(replyTo, e);
-					return false;
-				}
-			});
-		}, function (error) {
-			ircbot.say(replyTo, error);
+			utils.rss.sendToIrc(selectedEvents, replyTo, ircbot, utils);
 		});
 	}
 	
