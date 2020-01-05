@@ -86,6 +86,13 @@
 				"update": {
 					"startupScript": "/home/user/irc-notifier/start.sh"
 				},
+				"us": {
+					"rssUrl": "https://example.com/feed/",
+					"keywords": [
+						"foo",
+						"bar"
+					]
+				},
 				"weather": true,
 				"who": true,
 				"whois": true,

@@ -51,6 +51,10 @@ function getEvents(config, utils, callback) {
 }
 
 function sendToIrc(events, replyTo, ircbot, utils) {
+	if (events.length === 0) {
+		return ircbot.say(replyTo, 'No events found :(');
+	}
+	
 	const async = require('async');
 	
 	async.map(events, (event, callback) => shortenEventUrl(event, callback, utils), function(err, results) {
