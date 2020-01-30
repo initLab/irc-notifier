@@ -20,12 +20,14 @@ module.exports = function(config, ircbot, utils) {
 					}
 				}
 			}
+			
+			return ircbot.say(replyTo, 'The next council meeting hasn\'t been scheduled yet');
 		});
 	}
 	
 	return {
 		key: 'us',
-		description: 'shows next board meeting of init Lab',
+		description: 'shows next council meeting of init Lab',
 		execute: execute
 	};
 };
