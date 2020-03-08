@@ -24,20 +24,22 @@ module.exports = function(config, ircbot, utils) {
 					const currValue = data[key];
 					const label = value[0].toUpperCase() + value.substr(1);
 					const delta = Math.max(0, Date.now() - currValue.timestamp) / 1000;
-					const formattedTime = utils.time.formatTimePeriod(delta, true, 'ago');
+
+					let message = label + ': ' +
+						parseFloat(currValue.value).toFixed(1) + UNITS[value];
 					
-					values.push(
-						label + ': ' +
-						parseFloat(currValue.value).toFixed(1) + UNITS[value] +
-						' (' + formattedTime + ')'
-					);
+					if (delta > config.timeout) {
+						message += ' (' + utils.time.formatTimePeriod(delta, true, 'ago') + ')';
+					}
+					
+					values.push(message);
 				});
 				
 				if (values.length === 0) {
 					continue;
 				}
 				
-				ircbot.say(replyTo, config.sensors[sensor] + ': ' + values.join(' / '));
+				ircbot.say(replyTo, config.sensors[sensor].name + ': ' + values.join(' / '));
 			}
 		}, function(error) {
 			ircbot.say(replyTo, 'Env error: ' + error);

@@ -32,9 +32,14 @@
 				"door": true,
 				"env": {
 					"url": "http://example.com/status",
+					"timeout": 20,
 					"sensors": {
-						"sensor-1": "Example",
-						"sensor-2": "Example 2"
+						"sensor-1": {
+							"name": "Example"
+						},
+						"sensor-2": {
+							"name": "Example 2"
+						}
 					}
 				},
 				"events": {
