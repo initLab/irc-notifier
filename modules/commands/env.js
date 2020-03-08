@@ -14,19 +14,19 @@ module.exports = function(config, ircbot, utils) {
 			for (let sensor in config.sensors) {
 				let values = [];
 				
-				Object.keys(UNITS).forEach(function(value) {
-					const key = sensor + '/' + value;
+				Object.keys(UNITS).forEach(function(unit) {
+					const key = sensor + '/' + unit;
 					
 					if (!(key in data)) {
 						return;
 					}
 					
 					const currValue = data[key];
-					const label = value[0].toUpperCase() + value.substr(1);
+					const label = unit[0].toUpperCase() + unit.substr(1);
 					const delta = Math.max(0, Date.now() - currValue.timestamp) / 1000;
 
 					let message = label + ': ' +
-						parseFloat(currValue.value).toFixed(1) + UNITS[value];
+						parseFloat(currValue.value).toFixed(1) + UNITS[unit];
 					
 					if (delta > config.timeout) {
 						message += ' (' + utils.time.formatTimePeriod(delta, true, 'ago') + ')';
