@@ -25,10 +25,6 @@
 		"_whois": true,
 		"commands": {
 			"commands": {
-				"cs": {
-					"host": "example.com",
-					"port": 27015
-				},
 				"door": true,
 				"env": {
 					"url": "http://example.com/status",
@@ -72,16 +68,21 @@
 						}
 					}
 				},
+				"games": {
+					"servers": [{
+						"type": "hldm",
+						"host": "example.com"
+					}, {
+						"type": "cs16",
+						"host": "example.com",
+						"port": 27016
+					}, {
+						"type": "nexuiz",
+						"host": "example.com"
+					}]
+				},
 				"help": true,
-				"hl": {
-					"host": "example.com",
-					"port": 27015
-				},
 				"lights": true,
-				"mc": {
-					"host": "example.com",
-					"port": 25565
-				},
 				"music": true,
 				"power": true,
 				"sun": {
@@ -100,11 +101,7 @@
 				},
 				"weather": true,
 				"who": true,
-				"whois": true,
-				"xon": {
-					"host": "example.com",
-					"port": 26000
-				}
+				"whois": true
 			}
 		},
 		"console": true,
