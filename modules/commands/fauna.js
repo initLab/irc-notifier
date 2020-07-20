@@ -190,7 +190,19 @@ module.exports = function(config, ircbot, utils) {
 	oauth2 = require('simple-oauth2').create(config.oauth2.credentials);
 	
 	try {
-		let state = utils.file.readJson(authStateFile);
+		let state = {};
+
+		try {
+			state = utils.file.readJson(authStateFile);
+		}
+		catch (e) {
+			if (e.syscall === 'open' && e.code === 'ENOENT') {
+				utils.file.writeJson(authStateFile, state);
+			}
+			else {
+				throw e;
+			}
+		}
 
 		Object.keys(state).forEach(function(key) {
 			if ('token' in state[key]) {

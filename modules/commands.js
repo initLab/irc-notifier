@@ -9,6 +9,8 @@ module.exports = function(config, ircbot, utils) {
 		if (!sender || !replyTo) {
 			return;
 		}
+
+		text = text.trim();
 		
 		if (!['!', '.'].includes(text.charAt(0))) {
 			return;

@@ -42,7 +42,7 @@ function Socket(options, cmdCallback) {
 		
 		
 		if ('path' in options) {
-			fs.chmod(options.path, parseInt('775', 8));
+			fs.chmodSync(options.path, 0o775);
 		}
     });
 
