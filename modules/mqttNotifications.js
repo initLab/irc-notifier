@@ -106,7 +106,7 @@ module.exports = function(config, ircbot) {
 			return;
 		}
 
-		ircbot.say(config.channel, device.name + ' ' + message);
+		ircbot.notice(config.channel, device.name + ' ' + message);
 	});
 
 	mqttClient.on('connect', function() {
