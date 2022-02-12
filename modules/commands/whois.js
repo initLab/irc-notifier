@@ -2,6 +2,8 @@
 
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo, sender, text) {
+		// SSL is only available for paid accounts
+		// noinspection HttpUrlsUsage
 		utils.request.getJson('http://ip-api.com/json/' + encodeURIComponent(text), function(data) {
 			if (data.status === 'fail') {
 				ircbot.say(replyTo, 'Error looking up "' + data.query + '": ' + data.message);
@@ -15,7 +17,7 @@ module.exports = function(config, ircbot, utils) {
 			ircbot.say(replyTo, error);
 		});
 	}
-	
+
 	return {
 		key: 'whois',
 		description: 'lookups IP address',

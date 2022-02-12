@@ -2,19 +2,20 @@
 
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo) {
+		// noinspection HttpUrlsUsage
 		utils.request.getJson('http://spitfire.initlab.org:8989/status', function(data) {
 			if (data.error) {
 				ircbot.say('Error reading music status: ' + data.error);
 				return;
 			}
-			
+
 			const states = {
 				play: 'playing',
 				pause: 'paused',
 				stop: 'stopped',
 			};
 
-			ircbot.say(replyTo, 
+			ircbot.say(replyTo,
 				'[' + states[data.status.state] + ']' + (data.currentSong ? (' ' + (
 					data.currentSong.Artist ? (data.currentSong.Artist + ' - ') : ''
 				) + (
@@ -29,7 +30,7 @@ module.exports = function(config, ircbot, utils) {
 			ircbot.say(replyTo, error);
 		});
 	}
-	
+
 	return {
 		key: 'music',
 		description: 'shows current music track',
