@@ -11,6 +11,10 @@ module.exports = function(config, ircbot, utils) {
 					return point[0] !== null;
 				});
 
+				if (datapoints.length === 0) {
+					return;
+				}
+
 				var key = item.target.substr(item.target.lastIndexOf('.') + 1);
 				lastValues[key] = datapoints[datapoints.length - 1];
 
@@ -34,6 +38,11 @@ module.exports = function(config, ircbot, utils) {
 				var ts = statusChanges[statusChanges.length - 1][1];
 				sinceText = ' since ' + utils.time.formatDateTimeShort(ts * 1000) +
 				' (' + utils.time.formatTimePeriod(Math.floor(Date.now() / 1000) - ts, true, 'ago') + ')';
+			}
+
+			if (Object.keys(lastValues).length === 0) {
+				ircbot.say(replyTo, 'UPS data not available');
+				return;
 			}
 
 			ircbot.say(replyTo,
