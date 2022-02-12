@@ -34,7 +34,7 @@ module.exports = function(config, ircbot, utils) {
 				return;
 			}
 
-			if ('startupScript' in config) {
+			if ('restartCommand' in config) {
 				ircbot.say(replyTo, 'Updated successfully, restarting...');
 
 				setTimeout(function() {
