@@ -11,7 +11,7 @@ module.exports = function(config, ircbot, utils) {
 		});
 
 		git.stdout.on('data', (data) => {
-			if (data.toString() === 'Already up-to-date.\n') {
+			if (data.toString().match(/^Already up[ -]to[ -]date.\n$/)) {
 				needsUpdate = false;
 				ircbot.say(replyTo, data);
 			}
