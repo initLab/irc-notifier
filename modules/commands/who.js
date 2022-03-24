@@ -53,7 +53,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		keys: ['who'],
+		keys: ['who', 'кой'],
 		description: 'shows present users',
 		execute: execute
 	};
