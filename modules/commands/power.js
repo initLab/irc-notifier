@@ -59,7 +59,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'power',
+		keys: ['power'],
 		description: 'shows power status',
 		execute: execute
 	};

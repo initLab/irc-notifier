@@ -19,7 +19,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'whois',
+		keys: ['whois'],
 		description: 'lookups IP address',
 		execute: execute
 	};

@@ -8,9 +8,9 @@ module.exports = function(config, ircbot, utils) {
 			ircbot.say(replyTo, error);
 		});
 	}
-	
+
 	return {
-		key: 'lights',
+		keys: ['lights'],
 		description: 'shows lights status',
 		execute: execute
 	};

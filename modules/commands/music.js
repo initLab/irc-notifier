@@ -32,7 +32,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'music',
+		keys: ['music'],
 		description: 'shows current music track',
 		execute: execute
 	};

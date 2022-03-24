@@ -7,7 +7,7 @@ let authState = {};
 
 function saveAuthState(utils) {
 	let state = {};
-	
+
 	Object.keys(authState).forEach(function(key) {
 		if ('token' in authState[key]) {
 			state[key] = authState[key].token;
@@ -16,7 +16,7 @@ function saveAuthState(utils) {
 			state[key] = authState[key];
 		}
 	});
-	
+
 	utils.file.writeJson(authStateFile, state);
 }
 
@@ -24,7 +24,7 @@ function setAccessToken(ircbot, utils, sender, accountName, token) {
 	authState[accountName] = {
 		token: token
 	};
-	
+
 	saveAuthState(utils);
 
 	ircbot.notice(sender, 'Authorization successful!');
@@ -61,7 +61,7 @@ function getAuthURL(config, utils, sender, accountName, callback) {
 			state: state,
 			currentNickname: sender
 		};
-		
+
 		saveAuthState(utils);
 
 		authParams.state = state;
@@ -85,7 +85,7 @@ function checkUserToken(ircbot, utils, sender, callbackFound, callbackNotFound) 
 				if (error) {
 					return ircbot.notice(sender, 'Error while refreshing the token: ' + error.message + ' (code ' + error.code + ')');
 				}
-				
+
 				setAccessToken(ircbot, utils, sender, accountName, token);
 				callbackFound(token, accountName);
 			});
@@ -99,7 +99,7 @@ function getUserToken(ircbot, config, utils, sender, callback) {
 	checkUserToken(ircbot, utils, sender, callback, function(accountName) {
 		return getAuthURL(config, utils, sender, accountName, function(authorizationURL) {
 			ircbot.notice(sender, 'To use this bot, please link your IRC account with Fauna here: ' + authorizationURL);
-			
+
 			if (config.oauth2.authParams.redirect_uri === 'urn:ietf:wg:oauth:2.0:oob') {
 				ircbot.notice(sender, 'After you receive the code, please enter it using the following command: /msg ' + ircbot.nick + ' !fauna auth <your code here>');
 			}
@@ -144,7 +144,7 @@ function deauth(ircbot, utils, sender) {
 
 				delete authState[accountName];
 				saveAuthState(utils);
-				
+
 				ircbot.notice(sender, 'Access tokens revoked successfully');
 			});
 		});
@@ -188,7 +188,7 @@ function showInvalidCommand(ircbot, replyTo) {
 
 module.exports = function(config, ircbot, utils) {
 	oauth2 = require('simple-oauth2').create(config.oauth2.credentials);
-	
+
 	try {
 		let state = {};
 
@@ -228,14 +228,14 @@ module.exports = function(config, ircbot, utils) {
 			res.end('Missing request parameters');
 			return;
 		}
-		
+
 		let accountName;
-		
+
 		Object.keys(authState).forEach(function(key) {
 			if (accountName) {
 				return;
 			}
-			
+
 			if (!('state' in authState[key])) {
 				return;
 			}
@@ -243,15 +243,15 @@ module.exports = function(config, ircbot, utils) {
 			if (authState[key].state !== req.params.state) {
 				return;
 			}
-			
+
 			accountName = key;
 		});
-		
+
 		if (accountName) {
 			const userState = authState[accountName];
-			
+
 			getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, req.params.code);
-			
+
 			res.writeHead(200, {
 				'Content-Type': 'text/plain'
 			});
@@ -266,7 +266,7 @@ module.exports = function(config, ircbot, utils) {
 
 		res.end('Authorization state not valid. Please retry.');
 	});
-	
+
 	function execute(replyTo, sender, text) {
 		const authPrefix = 'auth ';
 		if (text.indexOf(authPrefix) === 0) {
@@ -295,9 +295,9 @@ module.exports = function(config, ircbot, utils) {
 				break;
 		}
 	}
-	
+
 	return {
-		key: 'fauna',
+		keys: ['fauna'],
 		description: 'interacts with init Lab\'s fauna',
 		execute: execute
 	};

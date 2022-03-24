@@ -47,7 +47,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'env',
+		keys: ['env'],
 		description: 'shows sensor readings',
 		execute: execute
 	};

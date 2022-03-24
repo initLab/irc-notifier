@@ -57,7 +57,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'update',
+		keys: ['update'],
 		description: 'updates the bot',
 		execute: execute
 	};

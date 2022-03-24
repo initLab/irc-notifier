@@ -6,12 +6,12 @@ module.exports = function(config, ircbot, utils) {
 			if (events instanceof Error) {
 				return ircbot.say(replyTo, events.message);
 			}
-			
+
 			// select events
 			for (let i = 0; i < events.length; ++i) {
 				const event = events[i];
 				const title = event.title.toString().toLowerCase();
-				
+
 				for (let j = 0; j < config.keywords.length; j++) {
 					if (title.indexOf(config.keywords[j].toLowerCase()) > -1) {
 						return utils.rss.sendToIrc([
@@ -20,13 +20,13 @@ module.exports = function(config, ircbot, utils) {
 					}
 				}
 			}
-			
+
 			return ircbot.say(replyTo, 'The next council meeting hasn\'t been scheduled yet');
 		});
 	}
-	
+
 	return {
-		key: 'us',
+		keys: ['us'],
 		description: 'shows next council meeting of init Lab',
 		execute: execute
 	};

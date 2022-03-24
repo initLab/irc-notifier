@@ -42,7 +42,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'sun',
+		keys: ['sun'],
 		description: 'shows sunrise/sunset time',
 		execute: execute
 	};

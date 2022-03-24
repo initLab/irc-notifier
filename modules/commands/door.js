@@ -10,7 +10,7 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	return {
-		key: 'door',
+		keys: ['door'],
 		description: 'shows door status',
 		execute: execute
 	};
