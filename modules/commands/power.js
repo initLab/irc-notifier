@@ -3,11 +3,11 @@
 module.exports = function(config, ircbot, utils) {
 	function execute(replyTo) {
 		utils.request.getJson('https://graphite.initlab.org/render/?target=apc.snmp.*&format=json&from=-3h', function(data) {
-			var lastValues = {};
-			var statusChanges = [];
+			const lastValues = {};
+			const statusChanges = [];
 
 			data.forEach(function(item) {
-				var datapoints = item.datapoints.filter(function(point) {
+				const datapoints = item.datapoints.filter(function (point) {
 					return point[0] !== null;
 				});
 
@@ -15,14 +15,14 @@ module.exports = function(config, ircbot, utils) {
 					return;
 				}
 
-				var key = item.target.substr(item.target.lastIndexOf('.') + 1);
+				const key = item.target.substr(item.target.lastIndexOf('.') + 1);
 				lastValues[key] = datapoints[datapoints.length - 1];
 
 				if (key === 'voltage-input') {
-					var lastState;
+					let lastState;
 
 					datapoints.forEach(function(point, idx) {
-						var isOnline = point[0] > 0;
+						let isOnline = point[0] > 0;
 
 						if (idx === 0 || lastState !== isOnline) {
 							lastState = isOnline;
@@ -32,10 +32,10 @@ module.exports = function(config, ircbot, utils) {
 				}
 			});
 
-			var sinceText = '';
+			let sinceText = '';
 
 			if (statusChanges.length > 1) {
-				var ts = statusChanges[statusChanges.length - 1][1];
+				const ts = statusChanges[statusChanges.length - 1][1];
 				sinceText = ' since ' + utils.time.formatDateTimeShort(ts * 1000) +
 				' (' + utils.time.formatTimePeriod(Math.floor(Date.now() / 1000) - ts, true, 'ago') + ')';
 			}

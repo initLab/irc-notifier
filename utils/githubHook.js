@@ -8,15 +8,15 @@ function formatHash(longHash) {
 
 function formatMessage(utils, event, payload, callback) {
 	let message = [];
-	
+
 	if (payload.repository) {
 		message.push('[' + payload.repository.full_name + ']');
 	}
-	
+
 	if (payload.sender) {
 		message.push(payload.sender.login);
 	}
-	
+
 	switch (event) {
 		case 'commit_comment':
 			message.push('commented on');
@@ -27,7 +27,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		case 'create':
 			message.push('created');
 			message.push(payload.ref_type);
@@ -71,7 +70,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		case 'issues':
 			switch (payload.action) {
 				case 'assigned':
@@ -147,7 +145,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		case 'label':
 			message.push(payload.action);
 			message.push('label');
@@ -169,13 +166,13 @@ function formatMessage(utils, event, payload, callback) {
 				}
 				break;
 			}
-			
+
 			message.push(payload.action);
-			
+
 			if (payload.action === 'edited') {
 				message.push('the permissions of');
 			}
-			
+
 			message.push(payload.member.login);
 			break;
 		case 'membership':
@@ -195,7 +192,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		// case 'organization': // not supported by formatter
 		// case 'org_block': // not supported by formatter
 		// case 'page_build': // not supported by formatter
@@ -230,7 +226,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		// case 'pull_request_review': // not supported by formatter
 		// case 'pull_request_review_comment': // not supported by formatter
 		case 'push':
@@ -247,7 +242,7 @@ function formatMessage(utils, event, payload, callback) {
 						payload.ref.substr('refs/heads/'.length) :
 						payload.ref
 					);
-					
+
 					if (payload.base_ref_name) {
 						message.push('from');
 						message.push(payload.base_ref_name);
@@ -261,7 +256,7 @@ function formatMessage(utils, event, payload, callback) {
 							message.push(formatHash(payload.after));
 						}
 					}
-					
+
 					const num = (payload.distinct_commits || []).length;
 					message.push('(+');
 					message.push(num);
@@ -322,7 +317,6 @@ function formatMessage(utils, event, payload, callback) {
 				callback(message.join(' '));
 			});
 			return;
-			break;
 		case 'repository':
 			message.push(payload.action);
 			message.push('the repository');
@@ -345,16 +339,16 @@ function formatMessage(utils, event, payload, callback) {
 				// too much spam
 				return;
 			}
-			
+
 			message.push('changed status of commit');
 			message.push(formatHash(payload.sha));
 			message.push('to');
 			message.push(payload.state);
-			
+
 			if (payload.description) {
 				message.push('(' + payload.description + ')');
 			}
-			
+
 			if (payload.target_url) {
 				message.push('-');
 				utils.url.shorten(utils.request, payload.target_url, function(url) {
@@ -378,7 +372,7 @@ function formatMessage(utils, event, payload, callback) {
 			message.push(event);
 			break;
 	}
-	
+
 	callback(message.join(' '));
 }
 
@@ -389,6 +383,5 @@ function sendMessage(ircbot, utils, recipient, event, payload) {
 }
 
 module.exports = {
-	formatMessage: formatMessage,
 	sendMessage: sendMessage
 };

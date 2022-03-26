@@ -1,18 +1,18 @@
 'use strict';
 
 module.exports = function(dir, modulesConfig) {
-	var Path = require('path');
-	var rootDir = Path.dirname(require.main.filename);
+	const Path = require('path');
+	const rootDir = Path.dirname(require.main.filename);
 
 	let result = {};
-	
+
 	for (let moduleName in modulesConfig) {
 		const moduleConfig = modulesConfig[moduleName];
-		
+
 		if (!moduleConfig) {
 			continue;
 		}
-		
+
 		try {
 			let args = Array.prototype.slice.call(arguments, 2);
 			args.unshift(moduleConfig);
@@ -23,6 +23,6 @@ module.exports = function(dir, modulesConfig) {
 			console.warn(e);
 		}
 	}
-	
+
 	return result;
 };

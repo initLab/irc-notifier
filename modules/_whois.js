@@ -14,18 +14,18 @@ module.exports = function(config, ircbot) {
 				break;
 		}
 	});
-	
+
 	ircbot.constructor.prototype.remoteWhois = function(nick, callback) {
 		if (typeof callback === 'function') {
-			var callbackWrapper = function(info) {
+			const callbackWrapper = function (info) {
 				let whoisNick = '';
 
 				try {
 					whoisNick = info.nick.toLowerCase();
+				} catch (e) {
 				}
-				catch (e) {}
 
-				if (whoisNick == nick.toLowerCase()) {
+				if (whoisNick === nick.toLowerCase()) {
 					this.removeListener('whois', callbackWrapper);
 					return callback.apply(this, arguments);
 				}

@@ -107,8 +107,8 @@ function getUserToken(ircbot, config, utils, sender, callback) {
 	});
 }
 
-function getAccessToken(ircbot, config, utils, sender, accountName, code) {
-	oauth2.authorizationCode.getToken({
+async function getAccessToken(ircbot, config, utils, sender, accountName, code) {
+	await oauth2.authorizationCode.getToken({
 		code: code,
 		redirect_uri: config.oauth2.authParams.redirect_uri
 	}, (error, result) => {
@@ -123,8 +123,8 @@ function getAccessToken(ircbot, config, utils, sender, accountName, code) {
 }
 
 function auth(ircbot, config, utils, sender, code) {
-	getAccountName(ircbot, sender, function(accountName) {
-		getAccessToken(ircbot, config, utils, sender, accountName, code);
+	getAccountName(ircbot, sender, async function (accountName) {
+		await getAccessToken(ircbot, config, utils, sender, accountName, code);
 	});
 }
 
@@ -154,7 +154,7 @@ function deauth(ircbot, utils, sender) {
 }
 
 function executeCommand(ircbot, config, utils, sender, cmd) {
-	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
+	getUserToken(ircbot, config, utils, sender, function(token) {
 		utils.request.postOAuth2(config.urls.actions.door, {
 			door_action: {
 				name: cmd
@@ -219,7 +219,7 @@ module.exports = function(config, ircbot, utils) {
 		console.log(e);
 	}
 
-	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', function(req, res) {
+	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', async function (req, res) {
 		if (!('code' in req.params) || !('state' in req.params)) {
 			res.writeHead(400, {
 				'Content-Type': 'text/plain'
@@ -231,7 +231,7 @@ module.exports = function(config, ircbot, utils) {
 
 		let accountName;
 
-		Object.keys(authState).forEach(function(key) {
+		Object.keys(authState).forEach(function (key) {
 			if (accountName) {
 				return;
 			}
@@ -250,7 +250,7 @@ module.exports = function(config, ircbot, utils) {
 		if (accountName) {
 			const userState = authState[accountName];
 
-			getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, req.params.code);
+			await getAccessToken(ircbot, config, utils, userState.currentNickname, accountName, req.params.code);
 
 			res.writeHead(200, {
 				'Content-Type': 'text/plain'

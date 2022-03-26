@@ -2,23 +2,24 @@
 
 module.exports = function(config, ircbot, utils) {
 	const logger = utils.logger.log;
-	
+
 	if (!('path' in config) && !('port' in config)) {
 		logger('Starting without control socket, because neither path nor port were provided');
 		return;
 	}
-	
+
 	function commandCallback(line) {
 		let args = line.split(' ');
 		let cmd = args.shift().toLowerCase();
-		
+
 		let argsOptional = false;
 		let knownCmd = true;
 		let sendCmd = true;
-		
+
 		switch (cmd) {
 			case 'quote':
 				cmd = 'send';
+			// noinspection FallThroughInSwitchStatementJS
 			case 'send':
 				// no need to modify args
 			break;
@@ -47,7 +48,7 @@ module.exports = function(config, ircbot, utils) {
 			case 'connect':
 			case 'activateFloodProtection':
 				argsOptional = true;
-				
+
 				if (0 in args) {
 					args = [
 						parseInt(args[0])
@@ -59,10 +60,10 @@ module.exports = function(config, ircbot, utils) {
 					sendCmd = false;
 					break;
 				}
-				
+
 				argsOptional = true;
 				const message = args.join(' ');
-				
+
 				if (message.length) {
 					args = [
 						message
@@ -74,7 +75,7 @@ module.exports = function(config, ircbot, utils) {
 			break;
 			default:
 				sendCmd = false;
-				
+
 				switch (cmd) {
 					case 'exit':
 						if (ircbot.conn) {
@@ -92,16 +93,16 @@ module.exports = function(config, ircbot, utils) {
 				}
 			break;
 		}
-		
+
 		if (knownCmd) {
 			logger('CMD: got CMD', cmd, 'ARGS', args);
-			
+
 			if (sendCmd) {
 				if (args.length === 0 && !argsOptional) {
 					logger('CMD: not enough arguments');
 					return;
 				}
-				
+
 				ircbot[cmd].apply(ircbot, args);
 			}
 		}
@@ -109,6 +110,6 @@ module.exports = function(config, ircbot, utils) {
 			logger('CMD: unknown CMD', cmd, 'ARGS', args);
 		}
 	}
-	
-	const controlSocket = new utils.commandSocket.Socket(config, commandCallback);
+
+	new utils.commandSocket.Socket(config, commandCallback);
 };

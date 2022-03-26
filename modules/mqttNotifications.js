@@ -28,7 +28,7 @@ module.exports = function(config, ircbot) {
 		}, item, {
 			state: null,
 			parseValue: plainParseValue,
-			shouldNotify: function(device, rawValue) {
+			shouldNotify: function() {
 				return true;
 			}
 		});

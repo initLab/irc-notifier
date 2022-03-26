@@ -9,7 +9,7 @@ function shortenGitIo(request, longUrl, callback) {
 		if ('location' in headers) {
 			return callback(headers.location);
 		}
-		
+
 		console.log('[Git.io] Location data not found', data, headers);
 		callback(longUrl);
 	}, function(error) {
@@ -29,19 +29,14 @@ function shortenIsGd(request, longUrl, callback) {
 
 function shorten(request, longUrl, callback) {
 	const parsed = new URL(longUrl);
-	
+
 	if (['github.com'].indexOf(parsed.hostname) !== -1) {
 		return shortenGitIo(request, longUrl, callback);
 	}
-	
-	return shortenIsGd(request, longUrl, callback);
-}
 
-function expand(shortUrl, callback) {
-	// TODO
+	return shortenIsGd(request, longUrl, callback);
 }
 
 module.exports = {
 	shorten: shorten,
-	expand: expand
 };
