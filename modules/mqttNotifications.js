@@ -1,7 +1,5 @@
 'use strict';
 
-const mqtt = require('mqtt');
-
 module.exports = function(config, ircbot) {
 	const plainParseValue = function(device, rawValue) {
 		if (rawValue === device.onValue) {
@@ -64,9 +62,7 @@ module.exports = function(config, ircbot) {
 
 	const topics = Object.keys(devices);
 
-	const mqttClient = mqtt.connect(config.serverUrl);
-
-	mqttClient.on('message', function (topic, payload) {
+	ircbot.on('mqttMessage', function (topic, payload) {
 		if (topics.indexOf(topic) === -1) {
 			console.warn('mqtt: unknown topic', topic);
 			return;
@@ -109,7 +105,7 @@ module.exports = function(config, ircbot) {
 		ircbot.notice(config.channel, device.name + ' ' + message);
 	});
 
-	mqttClient.on('connect', function() {
-		mqttClient.subscribe(topics);
+	topics.forEach(function(topic) {
+		ircbot.emit('mqttSubscribe', topic);
 	});
 };
