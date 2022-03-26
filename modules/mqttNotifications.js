@@ -64,7 +64,6 @@ module.exports = function(config, ircbot) {
 
 	ircbot.on('mqttMessage', function (topic, payload) {
 		if (topics.indexOf(topic) === -1) {
-			console.warn('mqtt: unknown topic', topic);
 			return;
 		}
 
