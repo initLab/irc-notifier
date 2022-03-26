@@ -219,7 +219,7 @@ module.exports = function(config, ircbot, utils) {
 		console.log(e);
 	}
 
-	ircbot.emit('registerHttp', 'get', '/oauth/fauna/callback', async function (req, res) {
+	ircbot.emit('httpRegister', 'get', '/oauth/fauna/callback', async function (req, res) {
 		if (!('code' in req.params) || !('state' in req.params)) {
 			res.writeHead(400, {
 				'Content-Type': 'text/plain'

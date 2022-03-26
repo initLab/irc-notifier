@@ -4,7 +4,7 @@ module.exports = function(config, ircbot, utils) {
 	let dispatcher = null;
 	let callbacks = [];
 
-	ircbot.addListener('registerHttp', function() {
+	ircbot.addListener('httpRegister', function() {
 		const callback = [].slice.call(arguments);
 
 		callbacks.push(callback);
