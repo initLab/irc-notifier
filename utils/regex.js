@@ -4,15 +4,15 @@ function matchAll(regex, data) {
 	if (regex.constructor !== RegExp) {
 		throw new Error('not RegExp');
 	}
-	
+
 	let matches = [];
-	
+
 	if (regex.global) {
 		let match;
-		
+
 		do {
 			match = regex.exec(data);
-			
+
 			if (match) {
 				matches.push(match);
 			}
@@ -20,13 +20,13 @@ function matchAll(regex, data) {
 		while (match);
 	}
 	else {
-		const match = regex.exec(text);
-		
+		const match = regex.exec(data);
+
 		if (match) {
 			matches.push(match);
 		}
 	}
-	
+
 	return matches;
 }
 
