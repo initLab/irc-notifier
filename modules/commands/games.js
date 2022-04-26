@@ -4,11 +4,25 @@ const Gamedig = require('gamedig');
 
 module.exports = function(config, ircbot, utils) {
 	function getGameName(result) {
-		return result.raw.gamename || result.query.pretty;
+		const query = result.query;
+		const raw = result.raw;
+
+		return (query.type === 'nexuiz' && raw.gamename) || query.pretty;
+	}
+
+	function getServerName(result) {
+		const raw = result.raw;
+
+		return result.name ||
+			((raw.description.text || '') + (raw.version.name ? (' [' + raw.version.name + ']') : ''));
+	}
+
+	function getMap(result) {
+		return result.map ? (' at ' + result.map) : '';
 	}
 
 	function formatStatus(result) {
-		return getGameName(result) + ' (' + result.name + ') at ' + result.map +
+		return getGameName(result) + ' (' + getServerName(result) + ')' + getMap(result) +
 			' with ' + result.players.length + '/' + result.maxplayers + ' players' +
 			(result.bots.length > 0 ? (' (' + result.bots.length + ' bots)') : '');
 	}
