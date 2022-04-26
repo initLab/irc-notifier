@@ -10,11 +10,21 @@ module.exports = function(config, ircbot, utils) {
 		return (query.type === 'nexuiz' && raw.gamename) || query.pretty;
 	}
 
-	function getServerName(result) {
+	function getServerVersion(result) {
 		const raw = result.raw;
 
-		return result.name ||
-			((raw.description.text || '') + (raw.version.name ? (' [' + raw.version.name + ']') : ''));
+		let version = raw.version?.name;
+
+		if (!version && raw.gameversion) {
+			const versionNum = parseInt(raw.gameversion, 10);
+			const major = Math.floor(versionNum / 10000);
+			const minor = Math.floor((versionNum % 10000) / 100);
+			const patch = versionNum % 100;
+
+			version = major.toString(10) + '.' + minor.toString(10) + '.' + patch.toString(10);
+		}
+
+		return version ? (' (' + version + ')') : '';
 	}
 
 	function getMap(result) {
@@ -22,14 +32,18 @@ module.exports = function(config, ircbot, utils) {
 	}
 
 	function formatStatus(result) {
-		return getGameName(result) + ' (' + getServerName(result) + ')' + getMap(result) +
+		return getGameName(result) + getServerVersion(result) + getMap(result) +
 			' with ' + result.players.length + '/' + result.maxplayers + ' players' +
 			(result.bots.length > 0 ? (' (' + result.bots.length + ' bots)') : '');
 	}
 
 	function formatPlayer(player, isBot) {
-		const frags = 'score' in player ? player.score : ('frags' in player ? player.frags : 0);
-		return '* ' + player.name + ' (' + Math.max(frags, 0) + ' frags)' + (isBot ? ' (BOT)' : '');
+		const frags = 'score' in player ? player.score : (
+			'frags' in player ? player.frags : null
+		);
+		return '* ' + player.name +
+			(frags !== null ? (' (' + frags + ' frags)') : '') +
+			(isBot ? ' (BOT)' : '');
 	}
 
 	function execute(replyTo, sender, text) {
