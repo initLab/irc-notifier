@@ -1,7 +1,8 @@
 'use strict';
 
 module.exports = function(config, ircbot) {
-	let skipMessages = [];
+	let lastMessageIndex = null;
+	let lastMessageTime = null;
 
 	ircbot.on('mqttMessage', function (topic, payload) {
 		if (topic !== config.topic) {
@@ -15,26 +16,13 @@ module.exports = function(config, ircbot) {
 				device.value === data.value
 		});
 
-		for (const device of matchingDevices) {
-			const message = device.message;
-
-			if (skipMessages.indexOf(message) > -1) {
-				continue;
+		for (const [index, device] of matchingDevices.entries()) {
+			if (index !== lastMessageIndex || Date.now() - lastMessageTime > device.timeout) {
+				ircbot.notice(config.channel, device.message);
 			}
 
-			if (device.timeout) {
-				(function(message) {
-					setTimeout(function() {
-						skipMessages = skipMessages.filter(function(skipMessage) {
-							return skipMessage !== message;
-						});
-					}, device.timeout);
-				})(message);
-
-				skipMessages.push(message);
-			}
-
-			ircbot.notice(config.channel, message);
+			lastMessageIndex = index;
+			lastMessageTime = Date.now();
 		}
 	});
 
