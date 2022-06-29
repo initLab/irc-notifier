@@ -1,8 +1,18 @@
 'use strict';
 
 module.exports = function(config, ircbot) {
-	let lastMessageIndex = null;
-	let lastMessageTime = null;
+	let lastMessageTimestamp = 0;
+	let lastMessageRepeats = 0;
+
+	setInterval(() => {
+		if (lastMessageRepeats === 0 || Date.now() - lastMessageTimestamp < config.repeatTimeout) {
+			return;
+		}
+
+		ircbot.notice(config.channel, '(last message repeated ' + lastMessageRepeats + ' time' +
+			(lastMessageRepeats === 1 ? '' : 's') + ')');
+		lastMessageRepeats = 0;
+	}, 1000);
 
 	ircbot.on('mqttMessage', function (topic, payload) {
 		if (topic !== config.topic) {
@@ -16,13 +26,16 @@ module.exports = function(config, ircbot) {
 				device.value === data.value
 		});
 
-		for (const [index, device] of matchingDevices.entries()) {
-			if (index !== lastMessageIndex || Date.now() - lastMessageTime > device.timeout) {
+		for (const device of matchingDevices) {
+			if (Date.now() - lastMessageTimestamp <= device.timeout) {
+				lastMessageRepeats++;
+			}
+			else {
 				ircbot.notice(config.channel, device.message);
+				lastMessageRepeats = 0;
 			}
 
-			lastMessageIndex = index;
-			lastMessageTime = Date.now();
+			lastMessageTimestamp = Date.now();
 		}
 	});
 
