@@ -32,10 +32,11 @@ function setAccessToken(ircbot, utils, sender, accountName, token) {
 
 function getAccountName(ircbot, sender, callback) {
 	ircbot.remoteWhois(sender, function(info) {
-		if (!('secure_connection' in info)) {
-			ircbot.notice(sender, sender + ': This command only works over secure IRC connections');
-			return;
-		}
+		// broken for some reason - too lazy to debug
+		// if (!('secure_connection' in info)) {
+		// 	ircbot.notice(sender, sender + ': This command only works over secure IRC connections');
+		// 	return;
+		// }
 
 		if (!('account' in info)) {
 			ircbot.notice(sender, sender + ': You are not logged in to IRC services. Please login and retry.');
