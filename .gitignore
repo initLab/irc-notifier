@@ -44,3 +44,6 @@ jspm_packages
 
 # Fauna OAuth2 state
 /fauna_oauth2_state.json
+
+# Daikin AC tokens
+/daikin-tokenset.json
