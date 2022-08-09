@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/initLab/irc-notifier#readme",
   "dependencies": {
-    "async": "^2.6.2",
+    "async": "^2.6.4",
     "daikin-controller-cloud": "^1.0.3",
     "gamedig": "^1.0.49",
     "httpdispatcher": "^2.1.2",
