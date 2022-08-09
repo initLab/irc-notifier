@@ -43,7 +43,7 @@ module.exports = function(config, ircbot, utils) {
 
 		if (devices && devices.length) {
 			for (let dev of devices) {
-				const mode = dev.getData('climateControl', 'operationMode');
+				const mode = dev.getData('climateControl', 'operationMode').value;
 				const setPointMode = ['heating', 'cooling', 'auto'].indexOf(mode) > -1 ? mode : 'auto';
 				const tempControlPath = '/operationModes/' + setPointMode + '/setpoints/roomTemperature';
 
