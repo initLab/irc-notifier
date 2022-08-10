@@ -49,7 +49,7 @@ module.exports = function(config, ircbot, utils) {
 
 				ircbot.say(replyTo,
 					dev.getData('climateControl', 'name').value + ': ' +
-					(dev.getData('climateControl', 'onOffMode').value ? 'ON' : 'OFF') + ', ' +
+					dev.getData('climateControl', 'onOffMode').value + ', ' +
 					'Mode: ' + dev.getData('climateControl', 'operationMode').value + ', ' +
 					'Target: ' + dev.getData('climateControl', 'temperatureControl', tempControlPath).value + '°C, ' +
 					'Room temp: ' + dev.getData('climateControl', 'sensoryData', '/roomTemperature').value + '°C, ' +
