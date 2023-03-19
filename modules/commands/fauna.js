@@ -1,5 +1,6 @@
 'use strict';
 
+const util = require('util');
 const authStateFile = 'fauna_oauth2_state.json';
 
 let oauth2;
@@ -154,22 +155,53 @@ function deauth(ircbot, utils, sender) {
 	});
 }
 
-function executeCommand(ircbot, config, utils, sender, cmd) {
+function executeCommand(ircbot, config, utils, sender, args) {
+	const [ action, doorId ] = args;
+
+	if (!action?.length || !doorId?.length) {
+		ircbot.notice(sender, 'Syntax is: !fauna <action> <doorId>');
+		return;
+	}
+
 	getUserToken(ircbot, config, utils, sender, function(token) {
-		utils.request.postOAuth2(config.urls.actions.door, {
-			door_action: {
-				name: cmd
+		const accessToken = token.token.access_token;
+
+		utils.request.getJsonOAuth2(config.urls.doors.status, accessToken, function(doors) {
+			const matchingDoors = doors.filter(door => door.id === doorId);
+
+			if (matchingDoors.length < 1) {
+				ircbot.notice(sender, 'No door with ID ' + doorId + ', choose from: ' +
+					doors.map(door => door.id).join(', '));
+				return;
 			}
-		}, token.token.access_token, function() {
-			ircbot.notice(sender, 'Action ' + cmd + ' successful');
+
+			const door = matchingDoors[0];
+			const supportedActions = door.supported_actions;
+
+			if (supportedActions.indexOf(action) < 0) {
+				ircbot.notice(sender, 'Action ' + action + ' on door ' + doorId + ' not found, choose from: ' +
+					supportedActions.join(', '));
+				return;
+			}
+
+			utils.request.postOAuth2(
+				util.format(config.urls.doors.action, doorId, action),
+				{},
+				accessToken, function() {
+					ircbot.notice(sender, 'Action ' + action + ' on door ' + doorId + ' was successful');
+				},
+				function(error) {
+					ircbot.notice(sender, 'Failed executing action ' + action + ' on door ' + doorId + ': ' + error);
+				}
+			);
 		}, function(error) {
-			ircbot.notice(sender, 'Failed executing action: ' + error);
+			ircbot.notice(sender, 'Failed getting door list: ' + error);
 		});
 	});
 }
 
 function showHelp(ircbot, replyTo) {
-	ircbot.say(replyTo, 'Subcommands list: open/lock/unlock - control door, deauth - revoke tokens, info - show your account info, help - show this help');
+	ircbot.say(replyTo, 'Subcommands list: open/lock/unlock <doorId> - control door, deauth - revoke tokens, info - show your account info, help - show this help');
 }
 
 function showInfo(ircbot, config, utils, sender) {
@@ -269,20 +301,19 @@ module.exports = function(config, ircbot, utils) {
 	});
 
 	function execute(replyTo, sender, text) {
-		const authPrefix = 'auth ';
-		if (text.indexOf(authPrefix) === 0) {
-			auth(ircbot, config, utils, sender, text.substr(authPrefix.length));
-			return;
-		}
+		const args = text.split(' ');
 
-		switch (text) {
+		switch (args[0]) {
+			case 'auth':
+				auth(ircbot, config, utils, sender, args[1]);
+				break;
 			case 'deauth':
 				deauth(ircbot, utils, sender);
 				break;
 			case 'open':
 			case 'lock':
 			case 'unlock':
-				executeCommand(ircbot, config, utils, sender, text);
+				executeCommand(ircbot, config, utils, sender, args);
 				break;
 			case 'help':
 				showHelp(ircbot, replyTo);
