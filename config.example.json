@@ -22,9 +22,24 @@
 				"port": 1234
 			}
 		},
+		"_messageRelay": {
+			"channels": [
+				"#example"
+			],
+			"listen": {
+				"host": "::",
+				"port": 2345
+			}
+		},
+		"_mqtt": {
+			"serverUrl": "mqtts://user:pass@example.com:8883/"
+		},
 		"_whois": true,
 		"commands": {
 			"commands": {
+				"ac": {
+					"tokenPath": "/tmp/daikin-tokenset.json"
+				},
 				"door": true,
 				"env": {
 					"url": "http://example.com/status",
@@ -124,6 +139,42 @@
 				"password": "secret"
 			}
 		},
-		"slap": true
+		"mqttNotifications": {
+			"channel": "#example",
+			"devices": [{
+				"type": "plain",
+				"name": "NetControl",
+				"topic": "NetControl/example/out/status",
+				"onValue": "online",
+				"offValue": "offline",
+				"onMessage": "is now online",
+				"offMessage": "is now offline"
+			}, {
+				"type": "netcontrol",
+				"name": "Device 1",
+				"subTopic": "example",
+				"channelNumber": 25,
+				"onMessage": "is now on",
+				"offMessage": "is now off"
+			}, {
+				"type": "espurna",
+				"name": "Device 2",
+				"prefix": "relay-2"
+			}]
+		},
+		"rfNotifications": {
+			"channel": "#example",
+			"topic": "arduino-rf-serial/out/receive",
+			"repeatTimeout": 5000,
+			"devices": [{
+				"message": "Message 1 received",
+				"protocol": 1,
+				"numBits": 24,
+				"value": 123456,
+				"timeout": 1000
+			}]
+		},
+		"slap": true,
+		"urlInfo": true
 	}
 }
