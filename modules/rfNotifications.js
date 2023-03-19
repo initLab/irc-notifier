@@ -3,14 +3,18 @@
 module.exports = function(config, ircbot) {
 	let lastMessageTimestamp = 0;
 	let lastMessageRepeats = 0;
+	let lastMessageChannel = null;
 
 	setInterval(() => {
 		if (lastMessageRepeats === 0 || Date.now() - lastMessageTimestamp < config.repeatTimeout) {
 			return;
 		}
 
-		ircbot.notice(config.channel, '(last message repeated ' + lastMessageRepeats + ' time' +
-			(lastMessageRepeats === 1 ? '' : 's') + ')');
+		if (lastMessageChannel) {
+			ircbot.notice(lastMessageChannel, '(last message repeated ' + lastMessageRepeats + ' time' +
+				(lastMessageRepeats === 1 ? '' : 's') + ')');
+		}
+
 		lastMessageRepeats = 0;
 	}, 1000);
 
@@ -27,11 +31,14 @@ module.exports = function(config, ircbot) {
 		});
 
 		for (const device of matchingDevices) {
+			const channel = device.channel || config.channel;
+
 			if (Date.now() - lastMessageTimestamp <= device.timeout) {
+				lastMessageChannel = channel;
 				lastMessageRepeats++;
 			}
 			else {
-				ircbot.notice(config.channel, device.message);
+				ircbot.notice(channel, device.message);
 				lastMessageRepeats = 0;
 			}
 

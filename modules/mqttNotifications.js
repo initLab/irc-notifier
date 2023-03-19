@@ -42,7 +42,7 @@ module.exports = function(config, ircbot) {
 				device.skipRepeated = true;
 				break;
 			case 'netcontrol':
-				device.topic = 'NetControl/' + device.subTopic + '/out/ch' + device.channel.toFixed(0);
+				device.topic = 'NetControl/' + device.subTopic + '/out/ch' + device.channelNumber.toFixed(0);
 				device.onValue = 1;
 				device.offValue = 0;
 				device.parseValue = function(device, rawValue) {
@@ -101,7 +101,7 @@ module.exports = function(config, ircbot) {
 			return;
 		}
 
-		ircbot.notice(config.channel, device.name + ' ' + message);
+		ircbot.notice(device.channel || config.channel, device.name + ' ' + message);
 	});
 
 	topics.forEach(function(topic) {
