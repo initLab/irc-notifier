@@ -10,6 +10,10 @@ module.exports = function(config, ircbot, utils) {
 			try {
 				const urlObj = new URL(parts[i]);
 
+				if (!(['http:', 'https:'].includes(urlObj.protocol))) {
+					continue;
+				}
+
 				utils.request.getWithOptions(urlObj.href, {
 					encoding: null,
 					headers: {
@@ -17,13 +21,13 @@ module.exports = function(config, ircbot, utils) {
 					}
 				}, function(data, headers) {
 					const matches = utils.http.decodeBuffer(data, headers).match(/<title ?.*?>([^<]*)<\/title>/i);
-					
+
 					if (matches && matches[1]) {
 						// we have found a title element
 						ircbot.say(to, '^ ' + utils.html.decodeEntities(matches[1].trim()) + ' ^');
 					}
 				}); // request errors are silently discarded
-				
+
 				// do not process more urls
 				break;
 			}
