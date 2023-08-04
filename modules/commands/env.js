@@ -29,13 +29,17 @@ module.exports = function(config, ircbot, utils) {
 		}
 
 		const prefix = matchingSensorKeys.concat().shift() + '/';
+		const {
+			timestamp,
+			value,
+		} = JSON.parse(payload.toString());
 
 		lastSensorReadings.push({
-			timestamp: Date.now(),
+			timestamp,
 			prefix: prefix,
 			topic: topic,
 			unit: topic.substr(prefix.length),
-			value: payload.toString(),
+			value,
 		});
 	});
 
