@@ -155,23 +155,30 @@ function deauth(ircbot, utils, sender) {
 	});
 }
 
+function getDoorsSummary(doors) {
+	return 'Available doors/actions: ' + doors.map(door => door.id + '(' + door.number + '): ' +
+		door.supported_actions.join(', ')
+	).join('; ');
+}
+
 function executeCommand(ircbot, config, utils, sender, args) {
-	const [ action, doorId ] = args;
-
-	if (!action?.length || !doorId?.length) {
-		ircbot.notice(sender, 'Syntax is: !fauna <action> <doorId>');
-		return;
-	}
-
 	getUserToken(ircbot, config, utils, sender, function(token) {
 		const accessToken = token.token.access_token;
 
 		utils.request.getJsonOAuth2(config.urls.doors.status, accessToken, function(doors) {
-			const matchingDoors = doors.filter(door => door.id === doorId);
+			const [ action, doorQuery ] = args;
+
+			if (!action?.length || !doorQuery?.length) {
+				ircbot.notice(sender, 'Syntax is: !fauna <action> <doorId>');
+				ircbot.notice(sender, getDoorsSummary(doors));
+				return;
+			}
+
+			const matchingDoors = doors.filter(door => door.id === doorQuery || door.number.toString(10) === doorQuery);
 
 			if (matchingDoors.length < 1) {
-				ircbot.notice(sender, 'No door with ID ' + doorId + ', choose from: ' +
-					doors.map(door => door.id).join(', '));
+				ircbot.notice(sender, 'No door with ID ' + doorQuery + ', choose from: ' +
+					doors.map(door => door.id + '(' + door.number + ')').join(', '));
 				return;
 			}
 
@@ -179,19 +186,19 @@ function executeCommand(ircbot, config, utils, sender, args) {
 			const supportedActions = door.supported_actions;
 
 			if (supportedActions.indexOf(action) < 0) {
-				ircbot.notice(sender, 'Action ' + action + ' on door ' + doorId + ' not found, choose from: ' +
+				ircbot.notice(sender, 'Action ' + action + ' on door ' + door.id + ' not found, choose from: ' +
 					supportedActions.join(', '));
 				return;
 			}
 
 			utils.request.postOAuth2(
-				util.format(config.urls.doors.action, doorId, action),
+				util.format(config.urls.doors.action, door.id, action),
 				{},
 				accessToken, function() {
-					ircbot.notice(sender, 'Action ' + action + ' on door ' + doorId + ' was successful');
+					ircbot.notice(sender, 'Action ' + action + ' on door ' + door.id + ' was successful');
 				},
 				function(error) {
-					ircbot.notice(sender, 'Failed executing action ' + action + ' on door ' + doorId + ': ' + error);
+					ircbot.notice(sender, 'Failed executing action ' + action + ' on door ' + door.id + ': ' + error);
 				}
 			);
 		}, function(error) {
@@ -206,9 +213,17 @@ function showHelp(ircbot, replyTo) {
 
 function showInfo(ircbot, config, utils, sender) {
 	getUserToken(ircbot, config, utils, sender, function(token, accountName) {
-		utils.request.getJsonOAuth2(config.urls.resourceOwner, token.token.access_token, function(data) {
+		const accessToken = token.token.access_token;
+
+		utils.request.getJsonOAuth2(config.urls.resourceOwner, accessToken, function(data) {
 			ircbot.notice(sender, 'You are logged in to IRC as ' + accountName + ' and have linked the following Fauna account:');
 			ircbot.notice(sender, 'Username: ' + data.username + ', Name: ' + data.name + ', Roles: ' + (data.roles.join(', ') || '<none>'));
+
+			utils.request.getJsonOAuth2(config.urls.doors.status, accessToken, function(doors) {
+				ircbot.notice(sender, getDoorsSummary(doors));
+			}, function(error) {
+				ircbot.notice(sender, 'Failed getting door list: ' + error);
+			});
 		}, function(error) {
 			ircbot.notice(sender, 'Failed getting user info: ' + error);
 		});
