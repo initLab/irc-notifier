@@ -28,7 +28,7 @@ module.exports = function(config, ircbot, utils) {
 		fs.writeFileSync(config.tokenPath, JSON.stringify(tokenSet));
 	});
 
-	if (!tokenSet.access_token || !tokenSet.refresh_token) {
+	if ((!tokenSet.access_token || !tokenSet.refresh_token) && config.credentials.userName && config.credentials.password) {
 		try {
 			daikinCloud.login(config.credentials.userName, config.credentials.password);
 		}
