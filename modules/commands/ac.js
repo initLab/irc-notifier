@@ -19,17 +19,7 @@ module.exports = function(config, ircbot, utils) {
 		communicationRetries: 3       // Amount of retries when connection timed out
 	};
 
-	const tokenSet = utils.file.readJson(config.tokenPath);
-
-	if (!tokenSet) {
-		console.error('No token file or invalid tokens: ', config.tokenPath);
-
-		return {
-			...moduleConfig,
-			execute: () => {},
-		};
-	}
-
+	const tokenSet = utils.file.readJson(config.tokenPath) ?? null;
 	const daikinCloud = new DaikinCloud(tokenSet, options);
 
 	// Event that will be triggered on new or updated tokens, save into file
@@ -37,6 +27,10 @@ module.exports = function(config, ircbot, utils) {
 		console.log(`UPDATED tokens, use for future and wrote to ${config.tokenPath}`);
 		fs.writeFileSync(config.tokenPath, JSON.stringify(tokenSet));
 	});
+
+	if (!tokenSet.access_token || !tokenSet.refresh_token) {
+		daikinCloud.login(config.credentials.userName, config.credentials.password);
+	}
 
 	async function execute(replyTo) {
 		const devices = await daikinCloud.getCloudDevices();
