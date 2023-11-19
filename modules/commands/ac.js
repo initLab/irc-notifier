@@ -29,7 +29,12 @@ module.exports = function(config, ircbot, utils) {
 	});
 
 	if (!tokenSet.access_token || !tokenSet.refresh_token) {
-		daikinCloud.login(config.credentials.userName, config.credentials.password);
+		try {
+			daikinCloud.login(config.credentials.userName, config.credentials.password);
+		}
+		catch (e) {
+			console.error(e);
+		}
 	}
 
 	async function execute(replyTo) {
