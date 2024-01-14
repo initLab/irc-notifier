@@ -31,7 +31,6 @@
 				"ac": {
 					"tokenPath": "/tmp/daikin-tokenset.json"
 				},
-				"door": true,
 				"env": {
 					"url": "http://example.com/status",
 					"timeout": 20,
@@ -88,9 +87,6 @@
 					}]
 				},
 				"help": true,
-				"lights": true,
-				"music": true,
-				"power": true,
 				"sun": {
 					"lat": 42.70789247,
 					"lng": 23.32527086
