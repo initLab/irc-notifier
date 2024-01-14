@@ -26,8 +26,9 @@ module.exports = function(config, ircbot) {
 		const action = data?.action?.substring(0, actionIndex > -1 ? actionIndex : undefined);
 		const actionVerb = ACTIONS[action] || action;
 		const deviceName = data?.device?.name?.en || data?.device?.id || 'an unidentified device';
+		const appName = data?.application?.name || 'an unidentified application';
 
-		ircbot.notice(config.channel, username + ' ' + actionVerb + ' the ' + deviceName);
+		ircbot.notice(config.channel, username + ' ' + actionVerb + ' the ' + deviceName + ' using ' + appName);
 	});
 
 	ircbot.emit('mqttSubscribe', config.topicPrefix + '+/action/+');
