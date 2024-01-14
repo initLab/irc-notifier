@@ -118,7 +118,7 @@
 			"username": "notifier",
 			"password": "example"
 		},
-		"mqttNotifications": {
+		"stateNotifications": {
 			"channel": "#example",
 			"devices": [{
 				"type": "plain",

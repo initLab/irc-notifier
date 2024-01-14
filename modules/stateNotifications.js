@@ -10,7 +10,7 @@ module.exports = function(config, ircbot) {
 			return false;
 		}
 
-		console.warn('mqtt: undefined value', device.topic, rawValue);
+		console.warn('stateNotifications: undefined value', device.topic, rawValue);
 	};
 
 	let devices = [];
@@ -53,7 +53,7 @@ module.exports = function(config, ircbot) {
 				}
 				break;
 			default:
-				console.warn('mqtt: unsupported device type', device.type);
+				console.warn('stateNotifications: unsupported device type', device.type);
 				return;
 		}
 
@@ -72,32 +72,32 @@ module.exports = function(config, ircbot) {
 		const newState = device.parseValue(device, newValue);
 
 		if (newState === undefined) {
-			console.warn('mqtt: failed parsing value', newValue, 'for topic', topic);
+			console.warn('stateNotifications: failed parsing value', newValue, 'for topic', topic);
 			return;
 		}
 
 		if (device.state === null) {
-			console.info('mqtt: setting initial state', newState, 'for topic', topic);
+			console.info('stateNotifications: setting initial state', newState, 'for topic', topic);
 			device.state = newState;
 			return;
 		}
 
 		if (newState === device.state) {
-			console.info('mqtt: received heartbeat with state', newState, 'for topic', topic);
+			console.info('stateNotifications: received heartbeat with state', newState, 'for topic', topic);
 
 			if (device.skipRepeated) {
 				return;
 			}
 		}
 		else {
-			console.info('mqtt: changing state from', device.state, 'to', newState, 'for topic', topic);
+			console.info('stateNotifications: changing state from', device.state, 'to', newState, 'for topic', topic);
 			device.state = newState;
 		}
 
 		const message = newState ? device.onMessage : device.offMessage;
 
 		if (message === null || !device.shouldNotify(device, newValue)) {
-			console.info('mqtt: skipped notification for topic', device.topic, 'state', newState, 'message', message);
+			console.info('stateNotifications: skipped notification for topic', device.topic, 'state', newState, 'message', message);
 			return;
 		}
 
