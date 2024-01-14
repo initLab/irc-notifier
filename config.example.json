@@ -118,6 +118,10 @@
 			"username": "notifier",
 			"password": "example"
 		},
+		"portierNotifications": {
+			"channel": "#example",
+			"topicPrefix": "portier/public/notifications/device/"
+		},
 		"stateNotifications": {
 			"channel": "#example",
 			"devices": [{
