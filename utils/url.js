@@ -20,7 +20,7 @@ function shortenGitIo(request, longUrl, callback) {
 
 function shortenIsGd(request, longUrl, callback) {
 	request.get('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl), function(data) {
-		callback(data);
+		callback(data === 'Error, database insert failed' ? '' : data);
 	}, function(error) {
 		console.log(error);
 		callback(longUrl);
