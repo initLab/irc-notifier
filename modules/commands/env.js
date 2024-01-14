@@ -29,10 +29,22 @@ module.exports = function(config, ircbot, utils) {
 		}
 
 		const prefix = matchingSensorKeys.concat().shift() + '/';
-		const {
-			timestamp,
-			value,
-		} = JSON.parse(payload.toString());
+		const parsed = JSON.parse(payload.toString());
+
+		let timestamp, value;
+
+		if (
+			typeof parsed === 'object' &&
+			parsed.hasOwnProperty('timestamp') &&
+			parsed.hasOwnProperty('value')
+		) {
+			timestamp = parsed.timestamp;
+			value = parsed.value;
+		}
+		else {
+			timestamp = Date.now();
+			value = parseFloat(parsed);
+		}
 
 		lastSensorReadings.push({
 			timestamp,
