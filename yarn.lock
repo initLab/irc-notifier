@@ -991,11 +991,6 @@ range-parser@~1.2.1:
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
-rcon@^1.0.3:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rcon/-/rcon-1.1.0.tgz#82a27bbfadd4c13b3c5d828b55ce15bd606eb7c3"
-  integrity sha512-eotwcApOBjfadTjqQlrZVR4jzlwGCMNxmHhnFZx+g4kouwwRstRHkk1ON7DzkqrHNIjADSh0cU3gThSsDolUpg==
-
 readable-stream@^3.0.0, readable-stream@^3.0.2, readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.6.0:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.6.2.tgz#56a9b36ea965c00c5a93ef31eb111a0f11056967"

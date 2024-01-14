@@ -24,7 +24,6 @@
     "iconv-lite": "^0.4.24",
     "irc-upd": "initLab/node-irc#fix-nickname-parsing",
     "mqtt": "^4.2.6",
-    "rcon": "^1.0.3",
     "request": "^2.88.0",
     "require-dir": "^0.3.0",
     "simple-oauth2": "^1.6.0",

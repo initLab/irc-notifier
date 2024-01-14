@@ -22,15 +22,6 @@
 				"port": 1234
 			}
 		},
-		"_messageRelay": {
-			"channels": [
-				"#example"
-			],
-			"listen": {
-				"host": "::",
-				"port": 2345
-			}
-		},
 		"_mqtt": {
 			"serverUrl": "mqtts://user:pass@example.com:8883/"
 		},
@@ -130,14 +121,6 @@
 		"login": {
 			"username": "notifier",
 			"password": "example"
-		},
-		"minecraftRelay": {
-			"channel": "#example",
-			"rcon": {
-				"host": "example.com",
-				"port": 25575,
-				"password": "secret"
-			}
 		},
 		"mqttNotifications": {
 			"channel": "#example",
