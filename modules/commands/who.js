@@ -30,7 +30,7 @@ module.exports = function(config, ircbot, utils) {
 			const people = data.filter(function(user) {
 				return user.id !== null;
 			}).map(function(user) {
-				return user.name + ' (' + user.username + ')';
+				return user.username;
 			});
 
 			if (mystery_users > 0) {
