@@ -87,6 +87,9 @@
 					}]
 				},
 				"help": true,
+				"music": {
+					"url": "https://example.com/status"
+				},
 				"sun": {
 					"lat": 42.70789247,
 					"lng": 23.32527086
